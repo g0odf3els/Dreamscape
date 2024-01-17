@@ -1,0 +1,27 @@
+﻿@using Dreamscape.Application.Files
+@model IEnumerable<ImageFileViewModel>
+
+
+<div class="file-gallery">
+    @foreach (var file in Model)
+    {
+        <div class="file-gallery__container">
+
+            <a asp-action="File" asp-controller="File" asp-route-id="@file.Id">
+                <img class="container file-gallery__img"
+                     src="@file.DisplaySizePath"
+                     alt="">
+            </a>
+
+            <div class="file-gallery__conainer-overlay">
+                <div>
+                    @file.Resolution.Width x @file.Resolution.Height
+                </div>
+                <div>
+                    @file.Uploader.Username
+                </div>
+            </div>
+
+        </div>
+    }
+</div>

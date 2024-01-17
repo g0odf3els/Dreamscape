@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>cf09b1a9-84bc-458b-918d-f35f8da8c9ed</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\previews\**" />
+    <Compile Remove="wwwroot\uploads\**" />
+    <Content Remove="wwwroot\previews\**" />
+    <Content Remove="wwwroot\uploads\**" />
+    <EmbeddedResource Remove="wwwroot\previews\**" />
+    <EmbeddedResource Remove="wwwroot\uploads\**" />
+    <EntityDeploy Remove="wwwroot\previews\**" />
+    <EntityDeploy Remove="wwwroot\uploads\**" />
+    <None Remove="wwwroot\previews\**" />
+    <None Remove="wwwroot\uploads\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Accord.Extensions.Math" Version="3.0.1" />
+    <PackageReference Include="Accord.Math" Version="3.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dreamscape.Application\Dreamscape.Application.csproj" />
+    <ProjectReference Include="..\Dreamscape.Persistance\Dreamscape.Persistance.csproj" />
+  </ItemGroup>
+
+</Project>

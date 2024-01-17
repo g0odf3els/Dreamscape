@@ -1,0 +1,295 @@
+﻿ @using System.Security.Claims;
+@using Dreamscape.Helpers;
+
+<header class="header">
+
+    <nav class="nav flex-row justify-content-space-between align-items-center">
+
+        <a class="nav__logo" asp-controller="File" asp-action="Files">Dreamscape</a>
+
+        <form class="searchbar-form" asp-controller="File" asp-action="Files" method="post" enctype="multipart/form-data">
+            <input id="search" type="text" name="tags" placeholder="Search..." />
+            <label for="file" class="file-label">
+                <span class="material-symbols-outlined">image</span>
+                <input type="file" id="file" name="file" class="file-input" />
+            </label>
+            <button style="border-color: white" class="animated-btn" type="submit">Search</button>
+        </form>
+
+        <div class="search-params">
+
+            <div class="dropdown">
+                <button class="dropbtn" id="dropbtn">Resolution</button>
+                <div class="dropdown-content">
+                    <div class="params-table">
+                        <div class="params-table_option resolution-option" data-value="3840x2400">3840x2400</div>
+                        <div class="params-table_option resolution-option" data-value="3840x2160">3840x2160</div>
+                        <div class="params-table_option resolution-option" data-value="2560x1600">2560x1600</div>
+                        <div class="params-table_option resolution-option" data-value="2560x1440">2560x1440</div>
+                        <div class="params-table_option resolution-option" data-value="2560x1080">2560x1080</div>
+                        <div class="params-table_option resolution-option" data-value="2560x1024">2560x1024</div>
+                        <div class="params-table_option resolution-option" data-value="2048x1152">2048x1152</div>
+                        <div class="params-table_option resolution-option" data-value="1920x1200">1920x1200</div>
+                        <div class="params-table_option resolution-option" data-value="1920x1080">1920x1080</div>
+                        <div class="params-table_option resolution-option" data-value="1680x1050">1680x1050</div>
+                        <div class="params-table_option resolution-option" data-value="1600x900">1600x900</div>
+                        <div class="params-table_option resolution-option" data-value="1440x900">1440x900</div>
+                        <div class="params-table_option resolution-option" data-value="1280x800">1280x800</div>
+                        <div class="params-table_option resolution-option" data-value="1280x720">1280x720</div>
+                        <div class="params-table_option resolution-option" data-value="1600x1200">1600x1200</div>
+                        <div class="params-table_option resolution-option" data-value="1400x1050">1400x1050</div>
+                        <div class="params-table_option resolution-option" data-value="1280x1024">1280x1024</div>
+                        <div class="params-table_option resolution-option" data-value="1280x960">1280x960</div>
+                        <div class="params-table_option resolution-option" data-value="1152x864">1152x864</div>
+                        <div class="params-table_option resolution-option" data-value="1024x768">1024x768</div>
+                        <div class="params-table_option resolution-option" data-value="2160x3840">2160x3840</div>
+                        <div class="params-table_option resolution-option" data-value="1440x2560">1440x2560</div>
+                        <div class="params-table_option resolution-option" data-value="1366x768">1366x768</div>
+                        <div class="params-table_option resolution-option" data-value="1080x1920">1080x1920</div>
+                        <div class="params-table_option resolution-option" data-value="1024x600">1024x600</div>
+                        <div class="params-table_option resolution-option" data-value="960x544">960x544</div>
+                        <div class="params-table_option resolution-option" data-value="800x1280">800x1280</div>
+                        <div class="params-table_option resolution-option" data-value="800x600">800x600</div>
+                        <div class="params-table_option resolution-option" data-value="720x1280">720x1280</div>
+                    </div>
+
+                    <div class="custom-resolution">
+                        <input type="text" id="customResolutionWidth" placeholder="Width">
+                        <label>x</label>
+                        <input type="text" id="customResolutionHeight" placeholder="Height">
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropbtn">Aspect Ratio</button>
+                <div class="dropdown-content">
+                    <div class="params-table">
+                        <div class="params-table_option aspect-ratio-option" data-value="16x9">16:9</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="16x10">16:10</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="21x9">21:9</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="32x9">32:9</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="48x9">48:9</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="9x16">9:16</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="10x16">10:16</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="9x18">9:18</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="1x1">1:1</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="3x2">3:2</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="4x3">4:3</div>
+                        <div class="params-table_option aspect-ratio-option" data-value="5x4">5:4</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="nav_auth-container">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="dropdown">
+                    <button class="dropbtn" id="dropbtn">@User.Identity.Name</button>
+                    <div class="dropdown-content">
+                        <a class="nav__link" asp-controller="File" asp-action="Upload">Upload</a>
+                        <a class="nav__link" asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
+                        <a class="nav__link" asp-controller="Collection" asp-action="ManageCollections">Collections</a>
+                        <a class="nav__link" asp-controller="Authorization" asp-action="Logout">Logout</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="dropdown">
+                    <button class="dropbtn" id="dropbtn">Authorization</button>
+                    <div class="dropdown-content">
+                        <a asp-controller="Authorization" asp-action="Login">Login</a>
+                        <a asp-controller="Authorization" asp-action="Register">Register</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </nav>
+
+</header>
+
+@using (Html.BeginScripts())
+{
+    <script>
+        $(function () {
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var resolutionsParam = urlParams.get('resolutions');
+            var aspectParam = urlParams.get('aspectRatios');
+            var tagParam = urlParams.get('tags');
+            var uploaderId = urlParams.get('uploaderId');
+
+            if (resolutionsParam) {
+                var selectedResolutions = resolutionsParam.split(',');
+
+                selectedResolutions.forEach(function (resolution) {
+                    $('.resolution-option[data-value="' + resolution + '"]').addClass('selected');
+                });
+            }
+
+            if (aspectParam) {
+                var selectedAspectRatios = aspectParam.split(',');
+
+                selectedAspectRatios.forEach(function (aspectRatio) {
+                    $('.aspect-ratio-option[data-value="' + aspectRatio + '"]').addClass('selected');
+                });
+            }
+
+            if (tagParam) {
+                $('#search').val(tagParam);
+            }
+
+            var dropbtns = document.querySelectorAll('.dropbtn');
+            var dropdownContents = document.querySelectorAll('.dropdown-content');
+
+            dropbtns.forEach(function (dropbtn, index) {
+                dropbtn.addEventListener('click', function () {
+                    var dropdownContent = dropdownContents[index];
+
+                    dropdownContent.style.display = (dropdownContent.style.display === 'block') ? 'none' : 'block';
+                    dropbtn.style.color = (dropbtn.style.color === 'black') ? 'white' : 'black';
+                    dropbtn.style.backgroundColor = (dropbtn.style.backgroundColor === 'white') ? 'black' : 'white';
+                });
+            });
+
+
+            $('.params-table_option').click(function () {
+                $(this).toggleClass('selected');
+            });
+
+            $("#search").on("input", function () {
+                var inputTag = $(this).val().trim();
+                if (inputTag !== "") {
+                    $.ajax({
+                        url: "/Tag/Tags",
+                        method: "GET",
+                        data: { prefix: inputTag },
+                        success: function (data) {
+                            var availableTags = data.map(function (tag) {
+                                return tag.name;
+                            });
+
+                            $("#search").autocomplete({
+                                source: availableTags
+                            });
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+
+            $('form.searchbar-form').submit(function (e) {
+                e.preventDefault();
+
+                var selectedResolutions = $('.resolution-option.selected').map(function () {
+                    return $(this).data('value');
+                }).get();
+
+                var selectedAspectRatios = $('.aspect-ratio-option.selected').map(function () {
+                    return $(this).data('value');
+                }).get();
+
+                var customWidth = $('#customResolutionWidth').val().trim();
+                var customHeight = $('#customResolutionHeight').val().trim();
+
+                if (customWidth && customHeight) {
+                    selectedResolutions.push(customWidth + 'x' + customHeight);
+                }
+
+                if (selectedResolutions.length > 0) {
+                    $('<input />').attr('type', 'hidden')
+                        .attr('name', 'resolutions')
+                        .attr('value', selectedResolutions)
+                        .appendTo('form.searchbar-form');
+                }
+
+                if (selectedAspectRatios.length > 0) {
+                    $('<input />').attr('type', 'hidden')
+                        .attr('name', 'aspectRatios')
+                        .attr('value', selectedAspectRatios)
+                        .appendTo('form.searchbar-form');
+                }
+
+                var inputTag = $('#search').val().trim();
+                if (inputTag.length == 0) {
+                    $('form.searchbar-form input[name="tags"]').remove();
+                }
+
+                this.submit();
+            });
+
+            var x, i, j, l, ll, selElmnt, a, b, c;
+            x = document.getElementsByClassName("custom-select");
+            l = x.length;
+            for (i = 0; i < l; i++) {
+                selElmnt = x[i].getElementsByTagName("select")[0];
+                ll = selElmnt.length;
+                a = document.createElement("DIV");
+                a.setAttribute("class", "select-selected");
+                a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+                x[i].appendChild(a);
+                b = document.createElement("DIV");
+                b.setAttribute("class", "select-items select-hide");
+                for (j = 1; j < ll; j++) {
+                    /* For each option in the original select element,
+                    create a new DIV that will act as an option item: */
+                    c = document.createElement("DIV");
+                    c.innerHTML = selElmnt.options[j].innerHTML;
+                    c.addEventListener("click", function (e) {
+                        var y, i, k, s, h, sl, yl;
+                        s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+                        sl = s.length;
+                        h = this.parentNode.previousSibling;
+                        for (i = 0; i < sl; i++) {
+                            if (s.options[i].innerHTML == this.innerHTML) {
+                                s.selectedIndex = i;
+                                h.innerHTML = this.innerHTML;
+                                y = this.parentNode.getElementsByClassName("same-as-selected");
+                                yl = y.length;
+                                for (k = 0; k < yl; k++) {
+                                    y[k].removeAttribute("class");
+                                }
+                                this.setAttribute("class", "same-as-selected");
+                                break;
+                            }
+                        }
+                        h.click();
+                    });
+                    b.appendChild(c);
+                }
+                x[i].appendChild(b);
+                a.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    closeAllSelect(this);
+                    this.nextSibling.classList.toggle("select-hide");
+                    this.classList.toggle("select-arrow-active");
+                });
+            }
+
+            function closeAllSelect(elmnt) {
+                var x, y, i, xl, yl, arrNo = [];
+                x = document.getElementsByClassName("select-items");
+                y = document.getElementsByClassName("select-selected");
+                xl = x.length;
+                yl = y.length;
+                for (i = 0; i < yl; i++) {
+                    if (elmnt == y[i]) {
+                        arrNo.push(i)
+                    } else {
+                        y[i].classList.remove("select-arrow-active");
+                    }
+                }
+                for (i = 0; i < xl; i++) {
+                    if (arrNo.indexOf(i)) {
+                        x[i].classList.add("select-hide");
+                    }
+                }
+            }
+        });
+    </script>
+}

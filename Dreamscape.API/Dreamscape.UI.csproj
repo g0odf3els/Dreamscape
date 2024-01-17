@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dreamscape.Application\Dreamscape.Application.csproj" />
+    <ProjectReference Include="..\Dreamscape.Persistance\Dreamscape.Persistance.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,276 @@
+﻿@model Dreamscape.UI.ViewModels.FileViewModel;
+
+@using System.Security.Claims;
+@using Dreamscape.Domain.Entities
+
+@section metatags {
+
+}
+
+<div class="file container flex-row">
+
+    <div class="sidebar file_left-sidebar">
+
+        @await Html.PartialAsync("_UserCard", Model.Image.Uploader)
+
+        <div class="color-palette">
+            @foreach (var color in Model.Image.Colors)
+            {
+                <div class="color-rectangle" style="background-color: rgba(@color.R, @color.G, @color.B, @color.A)"></div>
+            }
+        </div>
+
+        <div class="file-info pt-5 px-10">
+
+            <a class="file-resolution mt-10" asp-controller="File" asp-action="Files" asp-route-resolutions="@(Model.Image.Resolution.Width + "x" + Model.Image.Resolution.Height)">
+                @Model.Image.Resolution.Width x @Model.Image.Resolution.Height
+            </a>
+
+            <div class="sub-file-info">
+                <div>
+                    @Model.Image.DataCreated.DateTime
+                </div>
+                <div>
+                    @Math.Round((Model.Image.Lenght / 1048576), 3)Mb
+                </div>
+            </div>
+
+        </div>
+
+        <form class="pt-5 px-10" method="post" asp-action="Download" asp-controller="File" asp-route-id="@Model.Image.Id" enctype="multipart/form-data">
+            <button class="animated-btn" type="submit">
+                <div class="flex-row justify-content-space-between align-items-center">
+                    <span>Download</span>
+                    <span class="material-symbols-outlined">download</span>
+                </div>
+            </button>
+        </form>
+
+        @if (!Model.IsInUserCollection)
+        {
+            <form id="addToCollectionForm" class="pt-5 px-10" method="get" asp-action="Append" asp-controller="Collection" enctype="multipart/form-data" data-target="#myModal .modal-content">
+                <button id="addToFavoritesBtn" class="animated-btn" type="submit">
+                    <div class="flex-row justify-content-space-between align-items-center">
+                        <span>Add to collection</span>
+                        <span class="material-symbols-outlined">bookmark</span>
+                    </div>
+                </button>
+            </form>
+        }
+        else
+        {
+            <form class="pt-5 px-10" method="post" asp-action="Remove" asp-controller="Collection" asp-route-FileId="@Model.Image.Id" enctype="multipart/form-data">
+                <button class="animated-btn" type="submit">
+                    <div class="flex-row justify-content-space-between align-items-center">
+                        <span>Remove from collection</span>
+                        <span class="material-symbols-outlined">bookmark</span>
+                    </div>
+                </button>
+            </form>
+        }
+
+        <form class="pt-5 px-10" method="get" asp-action="Resize" asp-controller="File" asp-route-Id="@Model.Image.Id">
+            <button class="animated-btn" type="submit">
+                <div class="flex-row justify-content-space-between align-items-center">
+                    <span>Resize</span>
+                    <span class="material-symbols-outlined">aspect_ratio</span>
+                </div>
+            </button>
+        </form>
+
+        @if (@Model.Image.UploaderId == @User.FindFirstValue(ClaimTypes.NameIdentifier) || @User.IsInRole("Admin"))
+        {
+            <form class="pt-5 px-10" method="post" asp-action="Delete" asp-controller="File" asp-route-id="@Model.Image.Id" enctype="multipart/form-data">
+                <button class="animated-btn" type="submit">
+                    <div class="flex-row justify-content-space-between align-items-center">
+                        <span>Delete</span>
+                        <span class="material-symbols-outlined">delete</span>
+                    </div>
+                </button>
+            </form>
+        }
+
+        @if (Model.Image.UploaderId == @User.FindFirstValue(ClaimTypes.NameIdentifier))
+        {
+            <form class="add-tag-form pt-5 px-10" method="post" asp-action="AddTag" asp-controller="File" asp-route-fileId="@Model.Image.Id" enctype="multipart/form-data">
+                <input name="tagName" />
+                <button class="animated-btn" type="submit">
+                    <div class="flex-row justify-content-center align-items-center">
+                        <span class="material-symbols-outlined">add_box</span>
+                    </div>
+                </button>
+            </form>
+        }
+
+        <div class="tag-list pt-5 px-10 pb-5">
+            @foreach (var tag in Model.Image.Tags)
+            {
+                <div class="flex-row">
+
+                    <a class="tag-list__link" asp-controller="File" asp-action="Files" asp-route-tags="@tag.Name">
+                        <span class="tag-list__tag">
+                            @tag.Name
+                        </span>
+                    </a>
+
+                    @if (Model.Image.UploaderId == @User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    {
+                        <form method="post" asp-action="RemoveTag" asp-controller="File" asp-route-fileId="@Model.Image.Id" asp-route-tagName="@tag.Name" enctype="multipart/form-data">
+                            <button class="tag__delete-btn" type="submit">
+                                <div class="flex-row justify-content-center align-items-center">
+                                    <span class="material-symbols-outlined">close</span>
+                                </div>
+                            </button>
+                        </form>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="image-box">
+        <img src="@Model.Image.FullSizePath" />
+    </div>
+
+    <div class="sidebar file_right-sidebar">
+        @if (Model.SimilarImages != null)
+        {
+            <div class="similar-files">
+                @foreach (var file in Model.SimilarImages.Items)
+                {
+                    <div class="file-gallery__container">
+                        <a asp-action="File" asp-controller="File" asp-route-id="@file.Id">
+                            <img class="container file-gallery__img"
+                                 src="@file.DisplaySizePath">
+                        </a>
+                        <div class="file-gallery__conainer-overlay">
+                            @file.Resolution.Width x @file.Resolution.Height
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        var modal = document.getElementById('myModal');
+
+        function openModal() {
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        document.getElementById('addToFavoritesBtn').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: "/Collection/UserCollections",
+                type: 'Get',
+                success: function (data) {
+                    var modalContent = $('.modal-content');
+                    modalContent.empty();
+
+                    if (data.items.length === 0) {
+                        modalContent.append('<p>You don\'t have any collections yet</p>');
+                    }
+                    else {
+                        var collectionListDiv = $('<div class="collection__list">');
+
+                        data.items.forEach(function (collection) {
+                            var collectionDiv = $('<div class="collection">');
+
+                            var imageSrc = collection.files.length > 0 ? collection.files[0].displaySizePath : "/Assets/Images/black-rectangle.png";
+                            var collectionImage = $('<img src="' + imageSrc + '" alt="Collection Image" class="collection__image">');
+                            collectionDiv.append(collectionImage);
+
+                            collectionInfoDiv = $('<div class="collection__info">');
+                            collectionInfoDiv.append('<div class="collection__description">' + collection.name + '</div>');
+                            collectionDiv.append(collectionInfoDiv);
+                            collectionDiv.on('click', function () {
+                                submitCollectionFormAjax(collection.id);
+                                console.log(collection.name);
+
+                            });
+
+                            collectionListDiv.append(collectionDiv);
+                        });
+
+                        modalContent.append(collectionListDiv);
+                    }
+                    openModal();
+                },
+                error: function () {
+                    console.log('Error in AJAX request');
+                }
+            });
+        });
+
+        function submitCollectionFormAjax(collectionId) {
+            $.ajax({
+                url: '@Url.ActionLink("Append", "Collection", new { fileId = Model.Image.Id })',
+                type: 'POST',
+                data: { collectionId: collectionId },
+                success: function (response) {
+                    closeModal();
+                    location.reload();
+                },
+                error: function () {
+                    console.log('Error in AJAX request');
+                }
+            });
+        }
+
+
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        function openFullscreen(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        document.querySelector('.image-box img').addEventListener('click', function () {
+            var isInFullScreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+                (document.mozFullScreen || document.webkitIsFullScreen);
+
+            if (isInFullScreen) {
+                closeFullscreen();
+            } else {
+                openFullscreen(this);
+            }
+        });
+    </script>
+}
