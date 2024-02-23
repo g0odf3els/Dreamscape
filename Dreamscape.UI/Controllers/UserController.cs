@@ -28,10 +28,6 @@ namespace Dreamscape.UI.Controllers
                 {
                     UploaderId = user.Id.ToString(),
                     PageSize = 16
-                }),
-                RecentCollections = await _mediator.Send(new GetPagedCollectionsQuery()
-                {
-                    OwnerId = user.Id.ToString(),
                 })
             });
         }

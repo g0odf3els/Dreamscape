@@ -27,12 +27,15 @@
             </a>
 
             <div class="sub-file-info">
+
                 <div>
                     @Model.Image.DataCreated.DateTime
                 </div>
+
                 <div>
                     @Math.Round((Model.Image.Lenght / 1048576), 3)Mb
                 </div>
+
             </div>
 
         </div>
@@ -48,25 +51,25 @@
 
         @if (!Model.IsInUserCollection)
         {
-            <form id="addToCollectionForm" class="pt-5 px-10" method="get" asp-action="Append" asp-controller="Collection" enctype="multipart/form-data" data-target="#myModal .modal-content">
-                <button id="addToFavoritesBtn" class="animated-btn" type="submit">
+            <div class="pt-5 px-10">
+                <button class="animated-btn" type="submit" onclick="showAddToCollectionForm()">
                     <div class="flex-row justify-content-space-between align-items-center">
                         <span>Add to collection</span>
                         <span class="material-symbols-outlined">bookmark</span>
                     </div>
                 </button>
-            </form>
+            </div>
         }
         else
         {
-            <form class="pt-5 px-10" method="post" asp-action="Remove" asp-controller="Collection" asp-route-FileId="@Model.Image.Id" enctype="multipart/form-data">
+            <div class="pt-5 px-10">
                 <button class="animated-btn" type="submit">
                     <div class="flex-row justify-content-space-between align-items-center">
                         <span>Remove from collection</span>
                         <span class="material-symbols-outlined">bookmark</span>
                     </div>
                 </button>
-            </form>
+            </div>
         }
 
         <form class="pt-5 px-10" method="get" asp-action="Resize" asp-controller="File" asp-route-Id="@Model.Image.Id">
@@ -160,77 +163,174 @@
 
 @section Scripts {
     <script>
-
         var modal = document.getElementById('myModal');
 
         function openModal() {
-            modal.style.display = 'block';
+            modal.style.display = 'flex';
+            $('html, body').css({
+                overflow: 'hidden',
+            });
         }
 
         function closeModal() {
             modal.style.display = 'none';
+            $('html, body').css({
+                overflow: 'auto',
+            });
         }
 
-        document.getElementById('addToFavoritesBtn').addEventListener('click', function (event) {
-            event.preventDefault();
-
+        function showAddToCollectionForm() {
             $.ajax({
-                url: "/Collection/UserCollections",
+                url: "/Collection/User",
                 type: 'Get',
                 success: function (data) {
+
                     var modalContent = $('.modal-content');
                     modalContent.empty();
 
-                    if (data.items.length === 0) {
-                        modalContent.append('<p>You don\'t have any collections yet</p>');
-                    }
-                    else {
-                        var collectionListDiv = $('<div class="collection__list">');
+                    var imagePreview = $('<div class="add-to-collection-image-preview">');
+                    imagePreview.append('<img src="@Model.Image.FullSizePath">');
+                    modalContent.append(imagePreview);
 
-                        data.items.forEach(function (collection) {
-                            var collectionDiv = $('<div class="collection">');
+                    var addToCollectionForm = $('<div class="add-to-collection-form">');
+                    addToCollectionForm.append('<h2>Add to Collection</h2>')
+                    addToCollectionForm.append('<button class="animated-btn" onclick="showCreateCollectionForm()">Create a new collection</button>');
+                    addToCollectionForm.append('<button class="animated-btn" onclick="autoAppendToCollection()">Auto select</button>');
 
-                            var imageSrc = collection.files.length > 0 ? collection.files[0].displaySizePath : "/Assets/Images/black-rectangle.png";
-                            var collectionImage = $('<img src="' + imageSrc + '" alt="Collection Image" class="collection__image">');
-                            collectionDiv.append(collectionImage);
+                    var collectionListDiv = $('<div class="collection__list">');
+                    data.items.forEach(function (collection) {
+                        var collectionDiv = $('<div class="collection" id="' + collection.id + '">');
+                       
+                        if (collection.files.some(file => file.id === '@Model.Image.Id')) {
+                            collectionDiv.addClass('in-collection');
+                        }
 
-                            collectionInfoDiv = $('<div class="collection__info">');
-                            collectionInfoDiv.append('<div class="collection__description">' + collection.name + '</div>');
-                            collectionDiv.append(collectionInfoDiv);
-                            collectionDiv.on('click', function () {
-                                submitCollectionFormAjax(collection.id);
-                                console.log(collection.name);
-
-                            });
-
-                            collectionListDiv.append(collectionDiv);
+                        collectionDiv.on('click', function () {
+                            toogleCollection(collection.id);
                         });
 
-                        modalContent.append(collectionListDiv);
-                    }
-                    openModal();
-                },
-                error: function () {
-                    console.log('Error in AJAX request');
-                }
-            });
-        });
+                        collectionDiv.append('<div class="collection__name">' + collection.name + '</div>');
 
-        function submitCollectionFormAjax(collectionId) {
-            $.ajax({
-                url: '@Url.ActionLink("Append", "Collection", new { fileId = Model.Image.Id })',
-                type: 'POST',
-                data: { collectionId: collectionId },
-                success: function (response) {
-                    closeModal();
-                    location.reload();
-                },
-                error: function () {
-                    console.log('Error in AJAX request');
+                        var collectionTagsDiv = $('<div class="tag-list">');
+                        collection.tags.forEach(function (tag) {
+                            var tagSpan = $('<span class="tag-list__tag">' + tag.name + '</span>');
+                            collectionTagsDiv.append(tagSpan);
+                        });
+
+                        collectionDiv.append(collectionTagsDiv);
+                        collectionListDiv.append(collectionDiv);
+                    });
+
+                    addToCollectionForm.append(collectionListDiv);
+
+                    modalContent.append(addToCollectionForm);
+                    openModal();
                 }
             });
         }
 
+        function showCreateCollectionForm() {
+            var modalContent = $('.modal-content');
+            modalContent.empty();
+
+            var imagePreview = $('<div class="add-to-collection-image-preview">');
+            imagePreview.append('<img src="@Model.Image.FullSizePath">');
+            modalContent.append(imagePreview);
+
+            var addToCollectionForm = $('<div class="add-to-collection-form">');
+            addToCollectionForm.append('<h2>Create new collection</h2>')
+            addToCollectionForm.append('<label>Name</>')
+            addToCollectionForm.append('<input type="text" name="collectionName" placeholder="Collection Name" required>');
+            addToCollectionForm.append('<label>Description</>')
+            addToCollectionForm.append('<textarea type="text" name="collectionDescription" placeholder="Collection Description" required>');
+
+            var rememberDiv = $('<div class="remember-div">');
+            rememberDiv.append('<input type="checkbox" name="privateCollection"/>');
+            rememberDiv.append('<label>Private collection</label>');
+
+            addToCollectionForm.append(rememberDiv);
+            addToCollectionForm.append('<button class="animated-btn" onclick="submitCreateForm()">Create</button>');
+            addToCollectionForm.append('<button class="animated-btn" onclick="showAddToCollectionForm()">Back</button>');
+
+            modalContent.append(addToCollectionForm);
+        }
+
+        function toogleCollection(collectionId) {
+            var collectionDescription = $('#' + collectionId);
+            var isInCollection = collectionDescription.hasClass('in-collection');
+
+            if (isInCollection) {
+                removeFromCollection(collectionId);
+            } else {
+                appendToCollection(collectionId);
+            }
+        }
+
+        function createCollection(name, description, fileId, isPrivate) {
+            $.ajax({
+                url: "/Collection/Create",
+                type: 'POST',
+                data: {
+                    name: name,
+                    description: description,
+                    filesId: [fileId],
+                    isPrivate: isPrivate
+                },
+                success: function () {
+                    showAddToCollectionForm();
+                }
+            });
+        }
+
+        function appendToCollection(collectionId) {
+            $.ajax({
+                url: "/Collection/Append",
+                type: 'POST',
+                data: {
+                    collectionId: collectionId,
+                    fileId: '@Model.Image.Id'
+                },
+                success: function () {
+                    showAddToCollectionForm();
+                }
+            });
+        }
+
+        function autoAppendToCollection() {
+            $.ajax({
+                url: "/Collection/AutoAppend",
+                type: 'POST',
+                data: {
+                    fileId: '@Model.Image.Id'
+                },
+                success: function () {
+                    showAddToCollectionForm();
+                }
+            });
+        }
+
+        function removeFromCollection(collectionId) {
+            $.ajax({
+                url: "/Collection/Remove",
+                type: 'POST',
+                data: {
+                    collectionId: collectionId,
+                    fileId: '@Model.Image.Id'
+                },
+                success: function () {
+                    showAddToCollectionForm();
+                }
+            });
+        }
+
+        function submitCreateForm() {
+            var collectionName = $('input[name="collectionName"]').val();
+            var collectionDescription = $('textarea[name="collectionDescription"]').val();
+            var fileId = '@Model.Image.Id';
+            var isPrivate = $('input[name="privateCollection"]').is(":checked");
+            console.log(isPrivate);
+            createCollection(collectionName, collectionDescription, fileId, isPrivate);
+        }
 
         window.onclick = function (event) {
             if (event.target === modal) {
@@ -272,5 +372,6 @@
                 openFullscreen(this);
             }
         });
+
     </script>
 }

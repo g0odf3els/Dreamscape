@@ -20,7 +20,8 @@ namespace Dreamscape.Application.Collections.Queries.GetCollection
               [c => c.Id.ToString() == request.CollectionId],
               [
                   c => c.Owner,
-                  c => c.Files
+                  c => c.Files,
+                  c => c.Tags
               ],
               cancellationToken
             ) ?? throw new NotFoundException(nameof(Collection), request.CollectionId);

@@ -29,7 +29,7 @@ namespace Dreamscape.Persistance
             services.AddScoped<IColorRepository, ColorRepository>();
             services.AddScoped<ICollectionRepository, CollectionRepository>();
 
-            services.AddSingleton<IModelPredictionService, ModelPredictionService>();
+            services.AddScoped<IModelPredictionService, ModelPredictionService>();
 
             services.AddIdentity<User, IdentityRole>(
                 options =>

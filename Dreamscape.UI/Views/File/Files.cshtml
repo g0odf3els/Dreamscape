@@ -4,21 +4,15 @@
 
 @model PagedList<ImageFileViewModel>
 @{
-    ViewData["Title"] = $"";
-}
-
-@section metatags {
-
+    ViewData["Title"] = $"Images";
 }
 
 <div class="container flex-column">
 
     @await Html.PartialAsync("_FileGallery", Model.Items)
 
-    @if (Model.TotalPages > 1)
-    {
-        <div class="pagination-container">
-            @Html.PaginationLinks(@Model)
-        </div>
-    }
+    <div class="pagination-container">
+        @Html.PaginationLinks(@Model)
+    </div>
+
 </div>

@@ -24,16 +24,22 @@ namespace Dreamscape.Application.Collections.Queries.GetPagedCollections
                 filterExpressions = filterExpressions.Append(c => c.OwnerId == request.OwnerId).ToArray();
             }
 
+            if (request.Search != null && request.Search.Length > 0) 
+            {
+                filterExpressions = filterExpressions.Append(c => c.Name == request.Search).ToArray();
+            }
+
             var result = await _collectionRepository.GetPagedAsync(
               request.Page,
               request.PageSize,
               filterExpressions,
               null,
-              null,
               [
                   c => c.Files,
-                  c => c.Owner
+                  c => c.Owner,
+                  c => c.Tags
               ],
+              false,
               cancellationToken
           );
 

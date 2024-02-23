@@ -4,12 +4,12 @@
     {
         public static void ConfigureCorsPolicy(this IServiceCollection services)
         {
-            services.AddCors(opt =>
+            services.AddCors(options =>
             {
-                opt.AddDefaultPolicy(builder => builder
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+                options.AddPolicy("AllowAll", builder =>
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader());
             });
         }
     }

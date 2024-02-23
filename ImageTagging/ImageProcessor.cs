@@ -33,20 +33,19 @@ public class ImageProcessor
                 }
             }
         });
+
         return outputTensor;
     }
 
     public Tensor<float> ProcessImage(string filePath)
     {
         using var image = Image.Load<Rgb24>(filePath);
-        var outputTensor = ImageToTensor(image);
-        return outputTensor;
+        return ImageToTensor(image);
     }
 
     public Tensor<float> ProcessImage(Stream stream)
     {
         using var image = Image.Load<Rgb24>(stream);
-        var outputTensor = ImageToTensor(image);
-        return outputTensor;
+        return ImageToTensor(image);
     }
 }

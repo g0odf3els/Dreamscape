@@ -1,4 +1,5 @@
 ﻿using Dreamscape.Application.Files;
+using Dreamscape.Application.Tags;
 using Dreamscape.Application.Users;
 
 namespace Dreamscape.Application.Collections
@@ -14,5 +15,7 @@ namespace Dreamscape.Application.Collections
         public UserViewModel Owner { get; set; }
 
         public List<ImageFileViewModel> Files { get; set; }
+
+        public List<TagViewModel> Tags { get; set; }
     }
 }

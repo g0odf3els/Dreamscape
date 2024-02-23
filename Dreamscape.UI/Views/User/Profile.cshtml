@@ -31,66 +31,29 @@
 
     <div class="container">
 
-        <div class="tabs">
+        @if (Model.RecentUploads.TotalCount == 0)
+        {
+            <p>
+                User has not uploaded any files yet
+            </p>
+        }
+        else
+        {
+            @await Html.PartialAsync("_FileGallery", Model.RecentUploads.Items)
 
-            <ul class="tabs__caption">
-                <li class="active">Collections</li>
-                <li>Uploads</li>
-            </ul>
-
-            <div class="tabs__content active">
-                @if (Model.RecentCollections.TotalCount > 0)
-                {
-                    <div class="collection__list">
-                        @foreach (var collection in Model.RecentCollections.Items)
-                        {
-                            <a asp-controller="File" asp-action="Files" asp-route-collectionId="@collection.Id">
-                                <div class="collection">
-                                    <img src="@(collection.Files.FirstOrDefault()?.DisplaySizePath ?? "/Assets/Images/black-rectangle.png")" alt="Collection Image" class="collection__image">
-                                    <div class="collection__info">
-                                        <div class="collection__description">@collection.Name</div>
-                                        <div class="collection__owner">@collection.Owner.Username</div>
-                                    </div>
-                                </div>
-                            </a>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <p>
-                        User does not have any public collections yet
-                    </p>
-                }
-            </div>
-
-            <div class="tabs__content">
-
-                @if (Model.RecentUploads.TotalCount == 0)
-                {
-                    <p>
-                        User has not uploaded any files yet
-                    </p>
-                }
-                else
-                {
-                    @await Html.PartialAsync("_FileGallery", Model.RecentUploads.Items)
-
-                    @if (Model.RecentUploads.TotalPages > 1)
-                    {
-                        <form method="get" class="px-10 pb-5" action="/" enctype="multipart/form-data">
-                            <input type="hidden" name="UploaderId" value="@Model.User.Id.ToString()" />
-                            <button class="animated-btn" type="submit">
-                                <div class="flex-row justify-content-center align-items-center">
-                                    <span>See all</span>
-                                    <span class="material-symbols-outlined">expand_more</span>
-                                </div>
-                            </button>
-                        </form>
-                    }
-                }
-            </div>
-        </div>
+            @if (Model.RecentUploads.TotalPages > 1)
+            {
+                <form method="get" class="px-10 pb-5" action="/" enctype="multipart/form-data">
+                    <input type="hidden" name="UploaderId" value="@Model.User.Id.ToString()" />
+                    <button class="animated-btn" type="submit">
+                        <div class="flex-row justify-content-center align-items-center">
+                            <span>See all</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </div>
+                    </button>
+                </form>
+            }
+        }
     </div>
 
     @section Scripts {

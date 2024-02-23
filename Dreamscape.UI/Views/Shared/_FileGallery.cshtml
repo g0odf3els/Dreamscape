@@ -1,8 +1,9 @@
 ﻿@using Dreamscape.Application.Files
+
 @model IEnumerable<ImageFileViewModel>
 
-
 <div class="file-gallery">
+
     @foreach (var file in Model)
     {
         <div class="file-gallery__container">
@@ -14,12 +15,15 @@
             </a>
 
             <div class="file-gallery__conainer-overlay">
+
                 <div>
                     @file.Resolution.Width x @file.Resolution.Height
                 </div>
+
                 <div>
                     @file.Uploader.Username
                 </div>
+
             </div>
 
         </div>

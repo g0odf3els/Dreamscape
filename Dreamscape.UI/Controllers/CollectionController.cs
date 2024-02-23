@@ -1,4 +1,5 @@
 ﻿using Dreamscape.Application.Collections.Commands.AppendFileToCollection;
+using Dreamscape.Application.Collections.Commands.AutoAppendFileToCollection;
 using Dreamscape.Application.Collections.Commands.CreateCollection;
 using Dreamscape.Application.Collections.Commands.DeleteCollection;
 using Dreamscape.Application.Collections.Commands.RemoveFileFromCollection;
@@ -22,66 +23,80 @@ namespace Dreamscape.UI.Controllers
             _mediator = mediator;
         }
 
-        [Authorize]
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create(string name)
+        [HttpGet]
+        [HttpGet("Collections")]
+        public async Task<IActionResult> Collections(GetPagedCollectionsQuery request)
         {
-            await _mediator.Send(new CreateCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), name));
-            return Ok();
+            var collections = await _mediator.Send(request);
+
+            return View(collections);
         }
 
         [Authorize]
-        [HttpGet("ManageCollections")]
-        public async Task<IActionResult> ManageCollections()
+        [HttpGet("User")]
+        public async Task<IActionResult> GetUserCollections()
         {
             var collections = await _mediator.Send(new GetPagedCollectionsQuery()
             {
-                OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier)
-            });
-
-            var user = await _mediator.Send(new GetUserQuery(User.FindFirstValue(ClaimTypes.NameIdentifier)));
-
-            return View(new ManageCollectionsViewModel()
-            {
-                Collections = collections,
-                User = user
-            });
-        }
-
-        [Authorize]
-        [HttpGet("UserCollections")]
-        public async Task<IActionResult> UserCollections()
-        {
-            var collections = await _mediator.Send(new GetPagedCollectionsQuery()
-            {
-                OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                SortOrder = 2,
             });
 
             return Ok(collections);
         }
 
         [Authorize]
+        [HttpGet("Manage")]
+        public async Task<IActionResult> Manage(GetPagedCollectionsQuery request)
+        {
+            var collections = await _mediator.Send(new GetPagedCollectionsQuery()
+            {
+                OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                Page = request.Page,
+                PageSize = request.PageSize
+            });
+
+            return View(collections);
+        }
+
+        [Authorize]
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create(string name, string description, bool isPrivate = false, string[]? filesId = null)
+        {
+            await _mediator.Send(new CreateCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, name, description, isPrivate, filesId));
+            return Ok();
+        }
+
+        [Authorize]
         [HttpPost("Append")]
         public async Task<IActionResult> Append(string collectionId, string fileId)
         {
-            await _mediator.Send(new AppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), collectionId, fileId));
+            await _mediator.Send(new AppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("AutoAppend")]
+        public async Task<IActionResult> AutoAppend(string fileId)
+        {
+            await _mediator.Send(new AutoAppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, fileId));
             return Ok();
         }
 
         [Authorize]
         [HttpPost("Remove")]
-        public async Task<IActionResult> Remove(string fileId)
+        public async Task<IActionResult> Remove(string collectionId, string fileId)
         {
-            await _mediator.Send(new RemoveFileFromCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), fileId));
-            return RedirectToAction("File", "File", new { Id = fileId });
+            await _mediator.Send(new RemoveFileFromCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
+            return Ok();
         }
 
         [Authorize]
         [HttpPost("Delete{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            await _mediator.Send(new DeleteCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), id));
-            return RedirectToAction("MangeCollections", "Collection");
+            await _mediator.Send(new DeleteCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, id));
+            return Ok();
         }
     }
 }

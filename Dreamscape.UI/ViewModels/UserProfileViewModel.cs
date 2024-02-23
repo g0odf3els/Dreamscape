@@ -10,7 +10,5 @@ namespace Dreamscape.UI.ViewModels
         public UserViewModel User { get; set; }
 
         public PagedList<ImageFileViewModel> RecentUploads { get; set; }
-
-        public PagedList<CollectionViewModel> RecentCollections { get; set; }
     }
 }

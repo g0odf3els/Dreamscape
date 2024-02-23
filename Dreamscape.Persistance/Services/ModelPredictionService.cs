@@ -13,11 +13,6 @@ namespace WallpaperPortal.Services
             _modelPrediction = new ModelPrediction(configuration["MlModel:Path"], configuration["MlModel:LabelsPath"]);
         }
 
-        public IEnumerable<Prediction> PredictTags(string filePath)
-        {
-            return _modelPrediction.PredictTags(filePath);
-        }
-
         public float[] ProcessImageToVector(string filePath)
         {
             return _modelPrediction.ProcessImageToVector(filePath);
@@ -26,6 +21,15 @@ namespace WallpaperPortal.Services
         public float[] ProcessImageToVector(Stream stream)
         {
             return _modelPrediction.ProcessImageToVector(stream);
+        }
+        public IEnumerable<Prediction> ConvertVectorToPredictions(float[] featureVector)
+        {
+            return _modelPrediction.ConvertVectorToPredictions(featureVector);
+        }
+
+        public IEnumerable<Prediction> PredictTags(string filePath)
+        {
+            return _modelPrediction.PredictTagsForImage(filePath);
         }
     }
 }

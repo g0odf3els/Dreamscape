@@ -5,6 +5,7 @@ using Dreamscape.Persistance.Context;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Dreamscape.Persistance.Repositories
 {
@@ -14,7 +15,7 @@ namespace Dreamscape.Persistance.Repositories
 
         public BaseRepository(DataContext context)
         {
-            Context = context ?? throw new ArgumentNullException(nameof(context));
+            Context = context;
         }
 
         public T Create(T entity)
@@ -33,40 +34,52 @@ namespace Dreamscape.Persistance.Repositories
         }
 
         public async Task<T?> GetAsync(
-            Expression<Func<T, bool>>[]? filters,
-            Expression<Func<T, object>>[]? include,
-            CancellationToken cancellationToken)
-        {
-            var query = BuildQuery(filters, include);
-            return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        public async Task<List<T>> GetAllAsync(
-            Expression<Func<T, bool>>[]? filters = null,
-            Expression<Func<T, object>>? orderBy = null,
-            bool? orderByDescending = true,
-            Expression<Func<T, object>>[]? includes = null,
-            int? count = null,
+            Expression<Func<T, bool>>[]? predicate,
+            Expression<Func<T, object>>[]? include = null,
             CancellationToken cancellationToken = default)
         {
-            var query = BuildQuery(filters, includes);
-            query = ApplyOrder(query, orderBy, orderByDescending);
-            query = ApplyCount(query, count);
+            var query = Context.Set<T>().AsQueryable();
 
-            return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+            if (include != null && include.Length != 0)
+            {
+                query = include.Aggregate(query, (current, property) => current.Include(property));
+            }
+
+            if (predicate != null && predicate.Length != 0)
+            {
+                query = predicate.Aggregate(query, (current, filter) => current.Where(filter));
+            }
+
+            return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<PagedList<T>> GetPagedAsync(
             int pageNumber,
             int pageSize,
-            Expression<Func<T, bool>>[]? filter = null,
+            Expression<Func<T, bool>>[]? predicate = null,
             Expression<Func<T, object>>? orderBy = null,
-            bool? orderByDescending = true,
             Expression<Func<T, object>>[]? include = null,
+            bool? orderByDescending = false,
             CancellationToken cancellationToken = default)
         {
-            var query = BuildQuery(filter, include);
-            query = ApplyOrder(query, orderBy, orderByDescending);
+            var query = Context.Set<T>().AsQueryable();
+
+            if (include != null && include.Length != 0)
+            {
+                query = include.Aggregate(query, (current, property) => current.Include(property));
+            }
+
+            if (predicate != null && predicate.Length != 0)
+            {
+                query = predicate.Aggregate(query, (current, filter) => current.Where(filter));
+            }
+
+            if (orderBy != null)
+            {
+                query = orderByDescending.GetValueOrDefault()
+                    ? query.OrderByDescending(orderBy)
+                    : query.OrderBy(orderBy);
+            }
 
             var totalCount = await query.CountAsync(cancellationToken).ConfigureAwait(false);
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -78,46 +91,6 @@ namespace Dreamscape.Persistance.Repositories
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
-        }
-
-        protected IQueryable<T> BuildQuery(Expression<Func<T, bool>>[]? filters, Expression<Func<T, object>>[]? includes)
-        {
-            var query = Context.Set<T>().AsQueryable();
-
-            if (includes != null && includes.Length != 0)
-            {
-                query = includes.Aggregate(query, (current, property) => current.Include(property));
-            }
-
-            if (filters != null && filters.Length != 0)
-            {
-                var combinedFilter = PredicateBuilder.New<T>(true);
-                query = filters.Aggregate(query, (current, filter) => current.Where(filter));
-            }
-
-            return query;
-        }
-
-        protected IQueryable<T> ApplyOrder(IQueryable<T> query, Expression<Func<T, object>>? orderBy, bool? orderByDescending)
-        {
-            if (orderBy != null)
-            {
-                query = query = orderByDescending ?? true
-                ? query.OrderByDescending(orderBy)
-                : query.OrderBy(orderBy);
-            }
-
-            return query;
-        }
-
-        protected IQueryable<T> ApplyCount(IQueryable<T> query, int? count)
-        {
-            if (count != null)
-            {
-                query = query.Take(count.Value);
-            }
-
-            return query;
         }
     }
 }
