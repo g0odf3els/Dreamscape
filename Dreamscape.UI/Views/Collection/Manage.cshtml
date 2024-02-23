@@ -1,0 +1,87 @@
+﻿@using Dreamscape.Application.Collections
+@using Dreamscape.Application.Files.Queries
+@using WallpaperPortal.Helpers
+
+@model PagedList<CollectionViewModel>
+@{
+    ViewData["Title"] = $"";
+}
+
+@section metatags {
+
+}
+
+<div class="collection-manage container flex-column">
+
+    <div class="collection-gallery">
+        @foreach (var collection in Model.Items)
+        {
+            <div class="collection">
+                <div class="collection-header">
+
+                    <a asp-controller="File" asp-action="Files" asp-route-collectionId="@collection.Id">
+                        <div class="collection__name">
+                            @collection.Name
+                        </div>
+                    </a>
+
+                    <div class="collection-settings">
+                        <button class="collection-settings__button">
+                            <span class="material-symbols-outlined">settings</span>
+                        </button>
+                    </div>
+
+                </div>
+                <div class="tag-list">
+                    @foreach (var tag in collection.Tags)
+                    {
+                        <div class="flex-row">
+                            <a class="tag-list__link" asp-controller="File" asp-action="Files" asp-route-tags="@tag.Name">
+                                <span class="tag-list__tag">
+                                    @tag.Name
+                                </span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div class="pagination-container">
+        @Html.PaginationLinks(@Model)
+    </div>
+
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        var modal = document.getElementById('myModal');
+
+        function openModal() {
+            modal.style.display = 'flex';
+            $('html, body').css({ overflow: 'hidden' });
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            $('html, body').css({ overflow: 'auto' });
+        }
+
+        $('.collection-settings__button').click(function () {
+            openModal();
+        });
+
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+    </script>
+}

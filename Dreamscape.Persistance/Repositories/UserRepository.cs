@@ -33,10 +33,21 @@ namespace Dreamscape.Persistance.Repositories
             Context.Update(entity);
         }
 
-        public async Task<User?> GetAsync(Expression<Func<User, bool>>[]? filters, Expression<Func<User, object>>[]? includes, CancellationToken cancellationToken)
+        public async Task<User?> GetAsync(Expression<Func<User, bool>>[]? predicate, Expression<Func<User, object>>[]? include, CancellationToken cancellationToken)
         {
-            var query = BuildQuery(filters, includes);
-            return await query.FirstOrDefaultAsync(cancellationToken);
+            var query = Context.Set<User>().AsQueryable();
+
+            if (include != null && include.Length != 0)
+            {
+                query = include.Aggregate(query, (current, property) => current.Include(property));
+            }
+
+            if (predicate != null && predicate.Length != 0)
+            {
+                query = predicate.Aggregate(query, (current, filter) => current.Where(filter));
+            }
+
+            return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
         }
 
         public Task<User?> GetByEmail(string email, CancellationToken cancellationToken)
@@ -49,35 +60,7 @@ namespace Dreamscape.Persistance.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<List<User>> GetAllAsync(Expression<Func<User, bool>>[]? filters = null, Expression<Func<User, object>>? orderBy = null, bool? orderByDescending = true, Expression<Func<User, object>>[]? includes = null, int? count = null, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<PagedList<User>> GetPagedAsync(int pageNumber, int pageSize, Expression<Func<User, bool>>[]? filter = null, Expression<Func<User, object>>? orderBy = null, bool? orderByDescending = true, Expression<Func<User, object>>[]? include = null, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        private IQueryable<User> BuildQuery(Expression<Func<User, bool>>[]? filters, Expression<Func<User, object>>[]? includes)
-        {
-            var query = Context.Set<User>().AsQueryable();
-
-            if (includes != null && includes.Length != 0)
-            {
-                query = includes.Aggregate(query, (current, property) => current.Include(property));
-            }
-
-            if (filters != null && filters.Length != 0)
-            {
-                var combinedFilter = PredicateBuilder.New<User>(true);
-                query = filters.Aggregate(query, (current, filter) => current.Where(filter));
-            }
-
-            return query;
-        }
-
-        public Task<PagedList<User>> GetPagedAsync(int pageNumber, int pageSize, Expression<Func<User, bool>>[]? filter = null, Expression<Func<User, double>>? orderBy = null, bool? orderByDescending = true, Expression<Func<User, object>>[]? include = null, CancellationToken cancellationToken = default)
+        public Task<PagedList<User>> GetPagedAsync(int pageNumber, int pageSize, Expression<Func<User, bool>>[]? predicate = null, Expression<Func<User, object>>? orderBy = null, Expression<Func<User, object>>[]? include = null, bool? orderByDescending = false, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

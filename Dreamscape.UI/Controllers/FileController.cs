@@ -5,7 +5,6 @@ using Dreamscape.Application.Files.Commands.RemoveTagFromFile;
 using Dreamscape.Application.Files.Queries.GetFile;
 using Dreamscape.Application.Files.Queries.GetPagedFiles;
 using Dreamscape.Application.Files.Queries.GetSimilarPagedFiles;
-using Dreamscape.Application.Files.Queries.IsInUserCollection;
 using Dreamscape.UI.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +13,7 @@ using System.Security.Claims;
 
 namespace Dreamscape.Controllers
 {
+    [Route("File")]
     public class FileController : Controller
     {
         private readonly IMediator _mediator;
@@ -23,6 +23,7 @@ namespace Dreamscape.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("Files")]
         public async Task<IActionResult> Files(GetPagedFilesQuery query)
         {
             var result = await _mediator.Send(query);
@@ -35,12 +36,6 @@ namespace Dreamscape.Controllers
             var image = await _mediator.Send(query);
             var similarFiles = await _mediator.Send(new GetSimilarPagedFilesQuery() { FileId = image.Id.ToString(), PageSize = 6 });
             var isInUserCollection = false;
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId != null)
-            {
-                isInUserCollection = await _mediator.Send(new IsInUserCollectionQuery(userId, image.Id.ToString()));
-            }
 
             return View(new FileViewModel()
             {

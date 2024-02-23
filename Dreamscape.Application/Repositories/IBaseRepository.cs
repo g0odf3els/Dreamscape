@@ -12,25 +12,17 @@ namespace Dreamscape.Application.Repositories
         void Delete(T entity);
 
         Task<T?> GetAsync(
-            Expression<Func<T, bool>>[]? filter,
-            Expression<Func<T, object>>[]? include,
-            CancellationToken cancellationToken);
-
-        Task<List<T>> GetAllAsync(
-            Expression<Func<T, bool>>[]? filters = null,
-            Expression<Func<T, object>>? orderBy = null,
-            bool? orderByDescending = true,
-            Expression<Func<T, object>>[]? includes = null,
-            int? count = null,
+            Expression<Func<T, bool>>[]? predicate,
+            Expression<Func<T, object>>[]? include = null,
             CancellationToken cancellationToken = default);
 
         Task<PagedList<T>> GetPagedAsync(
             int pageNumber,
             int pageSize,
-            Expression<Func<T, bool>>[]? filter = null,
+            Expression<Func<T, bool>>[]? predicate = null,
             Expression<Func<T, object>>? orderBy = null,
-            bool? orderByDescending = true,
             Expression<Func<T, object>>[]? include = null,
+            bool? orderByDescending = false,
             CancellationToken cancellationToken = default);
 
     }

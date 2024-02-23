@@ -108,22 +108,24 @@ namespace Dreamscape.Application.Files.Commands.CreateFile
                 image.Write(filePreviewPath);
             }
 
-
-            foreach (var tagName in request.Tags)
+            if (request.Tags != null && request.Tags.Length > 0)
             {
-                var tag = await _tagRepository.GetAsync([t => t.Name == tagName], null, cancellationToken) ??
-                    _tagRepository.Create(new Tag()
-                    {
-                        Name = tagName
-                    });
+                foreach (var tagName in request.Tags)
+                {
+                    var tag = await _tagRepository.GetAsync([t => t.Name == tagName], null, cancellationToken) ??
+                        _tagRepository.Create(new Tag()
+                        {
+                            Name = tagName
+                        });
 
-                imageFile.Tags.Add(tag);
+                    imageFile.Tags.Add(tag);
+                }
             }
 
             imageFile.Vector = new Vector(_modelPredictionService.ProcessImageToVector(filePath));
+            var predictedTags = _modelPredictionService.ConvertVectorToPredictions(imageFile.Vector.ToArray());
 
-            var predictedTags = _modelPredictionService.PredictTags(filePath);
-            foreach (var prediction in predictedTags.Where(prediction => prediction.Confidence > -0.5))
+            foreach (var prediction in predictedTags.Where(prediction => prediction.Confidence > 1))
             {
                 var tag = await _tagRepository.GetAsync([tag => tag.Name == prediction.Label], null, cancellationToken) ??
                     _tagRepository.Create(new Tag()

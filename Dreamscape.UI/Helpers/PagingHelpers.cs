@@ -3,13 +3,12 @@ using Dreamscape.Application.Files.Queries;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Web;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WallpaperPortal.Helpers
 {
     public static class PagingHelpers
     {
-        public static IHtmlContent PaginationLinks(this IHtmlHelper html, PagedList<ImageFileViewModel> model)
+        public static IHtmlContent PaginationLinks<T>(this IHtmlHelper html, PagedList<T> model)
         {
             var ulTag = new TagBuilder("ul");
             ulTag.AddCssClass("pagination");
@@ -27,7 +26,7 @@ namespace WallpaperPortal.Helpers
             return ulTag;
         }
 
-        private static void AddPreviousPageLink(TagBuilder ulTag, PagedList<ImageFileViewModel> model, HttpRequest request, QueryString queryString)
+        private static void AddPreviousPageLink<T>(TagBuilder ulTag, PagedList<T> model, HttpRequest request, QueryString queryString)
         {
             if (model.PageNumber != 1)
             {
@@ -46,7 +45,7 @@ namespace WallpaperPortal.Helpers
             }
         }
 
-        private static void AddPageLinks(TagBuilder ulTag, PagedList<ImageFileViewModel> model, HttpRequest request, QueryString queryString)
+        private static void AddPageLinks<T>(TagBuilder ulTag, PagedList<T> model, HttpRequest request, QueryString queryString)
         {
             for (var i = Math.Max(1, model.PageNumber - 2); i <= Math.Min(model.TotalPages, model.PageNumber + 2); i++)
             {
@@ -70,7 +69,7 @@ namespace WallpaperPortal.Helpers
             }
         }
 
-        private static void AddNextPageLink(TagBuilder ulTag, PagedList<ImageFileViewModel> model, HttpRequest request, QueryString queryString)
+        private static void AddNextPageLink<T>(TagBuilder ulTag, PagedList<T> model, HttpRequest request, QueryString queryString)
         {
             if (model.PageNumber != model.TotalPages)
             {

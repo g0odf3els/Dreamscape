@@ -1,14 +1,15 @@
-﻿using AutoMapper;
-using Dreamscape.Application.Common.Exceptions;
-using Dreamscape.Application.Common.Helpers;
+﻿using MediatR;
+using AutoMapper;
 using Dreamscape.Application.Repositories;
 using Dreamscape.Application.Services;
+using Dreamscape.Application.Common.Exceptions;
 using Dreamscape.Domain.Entities;
-using MediatR;
+using Pgvector.EntityFrameworkCore;
+using Dreamscape.Application.Common.Helpers;
 
-namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
+namespace Dreamscape.Application.Collections.Commands.AutoAppendFileToCollection
 {
-    public class RemoveFileFromCollectionCommandHandler(
+    public class AutoAppendFileToCollectionCommandHandler(
         IUserRepository userRepository,
         IFileRepository fileRepository,
         ITagRepository tagRepository,
@@ -16,8 +17,9 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IModelPredictionService modelPredictionService)
-        : IRequestHandler<RemoveFileFromCollectionCommand, Unit>
+        : IRequestHandler<AutoAppendFileToCollectionCommand, CollectionViewModel>
     {
+
         readonly IUserRepository _userRepository = userRepository;
         readonly IFileRepository _fileRepository = fileRepository;
         readonly ITagRepository _tagRepository = tagRepository;
@@ -26,7 +28,8 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
         readonly IMapper _mapper = mapper;
         readonly IModelPredictionService _modelPredictionService = modelPredictionService;
 
-        public async Task<Unit> Handle(RemoveFileFromCollectionCommand request, CancellationToken cancellationToken)
+
+        public async Task<CollectionViewModel> Handle(AutoAppendFileToCollectionCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetAsync(
              [u => u.Id == request.UserId],
@@ -34,16 +37,28 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
              cancellationToken
            ) ?? throw new NotFoundException(nameof(User), request.UserId);
 
-            var collection = await _collectionRepository.GetAsync(
-                 [c => c.Id.ToString() == request.CollectionId],
-                 [
-                     c => c.Files,
-                     c => c.Tags,
-                 ],
-                 cancellationToken
-            ) ?? throw new NotFoundException(nameof(Collection), request.CollectionId);
+            var file = await _fileRepository.GetAsync(
+              [c => c.Id.ToString() == request.FileId],
+              null,
+              cancellationToken
+            ) ?? throw new NotFoundException(nameof(ImageFile), request.FileId);
 
-            collection.Files.RemoveAll(f => f.Id.ToString() == request.FileId);
+            var collections = await _collectionRepository.GetPagedAsync(
+                    1,
+                    15,
+                    [c => c.OwnerId == request.UserId],
+                    null,
+                    [
+                        c => c.Files,
+                        c => c.Tags
+                    ],
+                    false,
+                    cancellationToken
+                );
+
+            var collection = collections.Items.First();
+            
+            collection.Files.Add(file);
 
             var collectionVectors = collection.Files
                 .Select(file => file.Vector)
@@ -58,6 +73,8 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
 
                 var predictions = _modelPredictionService.ConvertVectorToPredictions(collection.Vector.ToArray());
 
+                collection.Tags.Clear();
+
                 foreach (var prediction in predictions.Where(prediction => prediction.Confidence > 1))
                 {
                     var tag = await _tagRepository.GetAsync([tag => tag.Name == prediction.Label], null, cancellationToken) ??
@@ -69,13 +86,12 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
                     collection.Tags.Add(tag);
                 }
             }
-            else
-            {
-                collection.Vector = null;
-            }
+
+            _collectionRepository.Update(collection);
 
             await _unitOfWork.Save(cancellationToken);
-            return new Unit();
+
+            return _mapper.Map<CollectionViewModel>(collection);
         }
     }
 }

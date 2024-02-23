@@ -7,8 +7,7 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
     {
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 16;
-
-        public string[]? Tags { get; set; }
+        public string? Search { get; set; }
 
         public string? Resolutions { get; set; }
         public string? AspectRatios { get; set; }

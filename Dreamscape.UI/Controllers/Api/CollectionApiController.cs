@@ -35,9 +35,9 @@ namespace Dreamscape.UI.Controllers.Api
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create(string name)
+        public async Task<IActionResult> Create(string name, string description, bool isPublic, string[] filesId)
         {
-            var result = await _mediator.Send(new CreateCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), name));
+            var result = await _mediator.Send(new CreateCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, name, description, isPublic, filesId));
             return Ok(result);
         }
 
@@ -45,7 +45,7 @@ namespace Dreamscape.UI.Controllers.Api
         [HttpPost("Append")]
         public async Task<IActionResult> Append(string collectionId, string fileId)
         {
-            await _mediator.Send(new AppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), collectionId, fileId));
+            await _mediator.Send(new AppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
             return Ok();
         }
     }

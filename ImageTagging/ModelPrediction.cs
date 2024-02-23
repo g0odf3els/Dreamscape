@@ -4,62 +4,50 @@ namespace Dreamscape.ImageRecognition;
 
 public class ModelPrediction
 {
-    private readonly ImageProcessor _imageProcessor;
-
-    private readonly InferenceSession _inferenceSession;
-
+    private Lazy<InferenceSession> _inferenceSession;
+    private Lazy<ImageProcessor> _imageProcessor;
     private readonly LabelsRegistry _labelsRegistry;
 
     public ModelPrediction(string modelPath, string labelsPath)
     {
-        _inferenceSession = new InferenceSession(modelPath);
-        _imageProcessor = new ImageProcessor();
+        _inferenceSession = new Lazy<InferenceSession>(() => new InferenceSession(modelPath));
+        _imageProcessor = new Lazy<ImageProcessor>(() => new ImageProcessor());
         _labelsRegistry = new LabelsRegistry(labelsPath);
     }
 
     public float[] ProcessImageToVector(string imagePath)
     {
         var inputs = new List<NamedOnnxValue>
-        {
-            NamedOnnxValue.CreateFromTensor("input.1", _imageProcessor.ProcessImage(imagePath))
-        };
+            {
+                NamedOnnxValue.CreateFromTensor("input", _imageProcessor.Value.ProcessImage(imagePath))
+            };
 
-        using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = _inferenceSession.Run(inputs);
+        using var results = _inferenceSession.Value.Run(inputs);
 
-        var featureVector = results.First().AsEnumerable<float>().ToArray();
-
-        return featureVector;
+        return results.First().AsEnumerable<float>().ToArray();
     }
 
     public float[] ProcessImageToVector(Stream stream)
     {
         var inputs = new List<NamedOnnxValue>
-        {
-            NamedOnnxValue.CreateFromTensor("input.1", _imageProcessor.ProcessImage(stream))
-        };
+            {
+                NamedOnnxValue.CreateFromTensor("input", _imageProcessor.Value.ProcessImage(stream))
+            };
 
-        using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = _inferenceSession.Run(inputs);
+        using var results = _inferenceSession.Value.Run(inputs);
 
-        var featureVector = results.First().AsEnumerable<float>().ToArray();
-
-        return featureVector;
+        return results.First().AsEnumerable<float>().ToArray();
     }
 
-    public IEnumerable<Prediction> PredictTags(string imagePath)
+    public List<Prediction> ConvertVectorToPredictions(float[] featureVector)
     {
-        var inputs = new List<NamedOnnxValue>
-        {
-            NamedOnnxValue.CreateFromTensor("input.1", _imageProcessor.ProcessImage(imagePath))
-        };
+        return featureVector.Select((confidence, labelIndex) =>
+            new Prediction(_labelsRegistry[labelIndex], confidence)).ToList();
+    }
 
-        using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = _inferenceSession.Run(inputs);
-
-        var output = results.First().AsEnumerable<float>();
-
-        var predictionResults = output
-            .Select((confidence, labelIndex) => new Prediction(_labelsRegistry[labelIndex], confidence))
-            .OrderBy(x => x.Confidence).ToList();
-
-        return predictionResults;
+    public IEnumerable<Prediction> PredictTagsForImage(string imagePath)
+    {
+        var featureVector = ProcessImageToVector(imagePath);
+        return ConvertVectorToPredictions(featureVector);
     }
 }

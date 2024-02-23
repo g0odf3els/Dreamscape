@@ -1,0 +1,18 @@
+﻿@using Dreamscape.Application.Collections
+@using Dreamscape.Application.Files.Queries
+@using WallpaperPortal.Helpers
+
+@model PagedList<CollectionViewModel>
+@{
+    ViewData["Title"] = $"";
+}
+
+<div class="collections container flex-column">
+
+    @await Html.PartialAsync("_CollectionGallery", Model.Items)
+
+    <div class="pagination-container">
+        @Html.PaginationLinks(@Model)
+    </div>
+
+</div>

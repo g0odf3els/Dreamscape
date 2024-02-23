@@ -30,12 +30,12 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
 
             if (request.UploaderId != null)
             {
-                filterExpressions = filterExpressions.Append(f => f.UploaderId == request.UserId).ToArray();
+                filterExpressions = filterExpressions.Append(f => f.UploaderId == request.UploaderId).ToArray();
             }
 
-            if (request.Tags != null && request.Tags.Length > 0)
+            if (request.Search != null && request.Search.Length > 0)
             {
-                filterExpressions = filterExpressions.Append(f => f.Tags.Any(t => request.Tags.Contains(t.Name))).ToArray();
+                filterExpressions = filterExpressions.Append(f => f.Tags.Any(t => t.Name == request.Search.ToLower())).ToArray();
             }
 
             if (request.Resolutions != null)
@@ -100,46 +100,17 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
                 }
             }
 
-            PagedList<ImageFile> result;
-
-            if (request.File != null)
-            {
-                float[] vector;
-                using (var ms = new MemoryStream())
-                {
-                    await request.File.CopyToAsync(ms);
-                    ms.Seek(0, SeekOrigin.Begin);
-                    vector = _modelPredictionService.ProcessImageToVector(ms);
-                }
-
-                result =  _fileRepository.GetSimilarPagedAsync(
-                   request.Page,
-                   request.PageSize,
-                   new Pgvector.Vector(vector),
-                   filterExpressions,
-                   [
-                       f => f.Resolution,
-                       f => f.Uploader,
-                       f => f.Colors
-                   ],
-                   cancellationToken
-               );
-            }
-            else
-            {
-                result = await _fileRepository.GetPagedAsync(
-                   request.Page,
-                   request.PageSize,
-                   filterExpressions,
-                   null,
-                   null,
-                   [
-                       f => f.Resolution,
-                       f => f.Uploader,
-                   ],
-                   cancellationToken
-               );
-            }
+            
+            var result = await _fileRepository.GetPagedAsync(
+                pageNumber: request.Page,
+                pageSize: request.PageSize,
+                predicate: filterExpressions,
+                include: [
+                    f => f.Resolution,
+                    f => f.Uploader,
+                    f => f.Colors
+                 ],
+               cancellationToken: cancellationToken);
 
             return _mapper.Map<PagedList<ImageFileViewModel>>(result);
         }
