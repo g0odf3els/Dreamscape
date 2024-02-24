@@ -7,8 +7,8 @@
 
         <a class="nav__logo" asp-controller="File" asp-action="Files">Dreamscape</a>
 
-        <form class="searchbar-form" asp-controller="File" asp-action="Files" method="post" enctype="multipart/form-data">
-            <input id="search" type="text" name="tags" placeholder="Search..." />
+        <form class="searchbar-form" asp-controller="File" asp-action="Files" method="get" enctype="multipart/form-data">
+            <input id="search" type="text" name="search" placeholder="Search..." />
             <button style="border-color: white" class="animated-btn" type="submit">Search</button>
         </form>
 
@@ -87,7 +87,7 @@
                     <div class="dropdown-content">
                         <a class="nav__link" asp-controller="File" asp-action="Upload">Upload</a>
                         <a class="nav__link" asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
-                        <a class="nav__link" asp-controller="Collection" asp-action="ManageCollections">Collections</a>
+                        <a class="nav__link" asp-controller="Collection" asp-action="Manage">Collections</a>
                         <a class="nav__link" asp-controller="Authorization" asp-action="Logout">Logout</a>
                     </div>
                 </div>

@@ -16,13 +16,28 @@
     <div class="collection-gallery">
         @foreach (var collection in Model.Items)
         {
-            <div class="collection">
+            <div class="collection" 
+                data-collection-id="@collection.Id" 
+                data-collection-name="@collection.Name" 
+                data-collection-description="@collection.Description" 
+                data-collection-private="@collection.IsPrivate">
+
                 <div class="collection-header">
 
                     <a asp-controller="File" asp-action="Files" asp-route-collectionId="@collection.Id">
+                        
                         <div class="collection__name">
                             @collection.Name
                         </div>
+
+                        <div class="collection__description">
+                            @collection.Description
+                        </div>
+
+                        <div class="collection__protection">
+                            @(collection.IsPrivate ? "Private" : "Public")
+                        </div>
+
                     </a>
 
                     <div class="collection-settings">
@@ -47,10 +62,10 @@
             </div>
         }
     </div>
+
     <div class="pagination-container">
         @Html.PaginationLinks(@Model)
     </div>
-
 
     <div id="myModal" class="modal">
         <div class="modal-content">
@@ -74,8 +89,72 @@
         }
 
         $('.collection-settings__button').click(function () {
-            openModal();
+            var collectionId = $(this).closest('.collection').data('collection-id');
+            var collectionName = $(this).closest('.collection').data('collection-name');
+            var collectionDescription = $(this).closest('.collection').data('collection-description');
+            var isPrivate = $(this).closest('.collection').data('collection-private');
+            editCollectionForm(collectionId, collectionName, collectionDescription, isPrivate);
         });
+
+        function editCollectionForm(collectionId, collectionName, collectionDescription, isPrivate) {
+            var modalContent = $('.modal-content');
+            modalContent.empty();
+
+            console.log(collectionId);
+
+            var addToCollectionForm = $('<div class="add-to-collection-form">');
+            addToCollectionForm.append('<h2>Edit Collection</h2>');
+
+            addToCollectionForm.append('<label name="collectionId">' + collectionId + '</label>');
+            addToCollectionForm.append('<label>Name</label>');
+            addToCollectionForm.append('<input type="text" name="collectionName" placeholder="Collection Name" value="' + collectionName + '" required>');
+            addToCollectionForm.append('<label>Description</label>');
+            addToCollectionForm.append('<textarea type="text" name="collectionDescription" placeholder="Collection Description" required>' + collectionDescription + '</textarea>');
+
+            var rememberDiv = $('<div class="remember-div">');
+            if (isPrivate == "True") {
+                rememberDiv.append('<input type="checkbox" name="privateCollection" checked/>');
+            }
+            else {
+                rememberDiv.append('<input type="checkbox" name="privateCollection"/>');
+            }
+
+            rememberDiv.append('<label>Private collection</label>');
+            addToCollectionForm.append(rememberDiv);
+
+            addToCollectionForm.append('<button class="animated-btn" onclick="submitUpdateForm()"> Update </button>');
+            addToCollectionForm.append('<button class="animated-btn" onclick="closeModal()">Close</button>');
+
+            modalContent.append(addToCollectionForm);
+            openModal();
+        }
+
+        function submitUpdateForm() {
+
+            var collectionId = $('[name="collectionId"]').text();
+            console.log(collectionId);
+
+            var name = $('[name="collectionName"]').val();
+            var description = $('[name="collectionDescription"]').val();
+            var isPrivate = $('[name="privateCollection"]').is(":checked");
+
+            $.ajax({
+                type: 'POST',
+                url: '/Collection/Update',
+                data: {
+                    collectionId: collectionId,
+                    name: name,
+                    description: description,
+                    isPrivate: isPrivate
+                },
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (error) {
+                    console.error('Error updating collection:', error);
+                }
+            });
+        }
 
         window.onclick = function (event) {
             if (event.target === modal) {
