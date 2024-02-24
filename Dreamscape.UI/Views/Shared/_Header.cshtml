@@ -86,7 +86,7 @@
                     <button class="dropbtn" id="dropbtn">@User.Identity.Name</button>
                     <div class="dropdown-content">
                         <a class="nav__link" asp-controller="File" asp-action="Upload">Upload</a>
-                        <a class="nav__link" asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
+                        <a class="nav__link" asp-controller="User" asp-action="Uploads" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
                         <a class="nav__link" asp-controller="Collection" asp-action="Manage">Collections</a>
                         <a class="nav__link" asp-controller="Authorization" asp-action="Logout">Logout</a>
                     </div>

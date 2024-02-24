@@ -15,7 +15,7 @@ namespace Dreamscape.UI.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("", "Files");
         }
 
         public IActionResult Privacy()

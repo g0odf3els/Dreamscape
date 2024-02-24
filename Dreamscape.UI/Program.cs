@@ -64,7 +64,7 @@ app.UseSwaggerUI();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action}/{id?}",
-    defaults: new { controller = "File", action = "Files" });
+    defaults: new { controller = "Home", action = "Index" });
 
 app.Run();
 
