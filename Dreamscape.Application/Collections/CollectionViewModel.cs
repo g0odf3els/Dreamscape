@@ -10,6 +10,10 @@ namespace Dreamscape.Application.Collections
 
         public string Name { get; set; }
 
+        public string? Description { get; set; }
+
+        public bool IsPrivate { get; set; }
+
         public DateTimeOffset DataCreated { get; set; }
 
         public UserViewModel Owner { get; set; }

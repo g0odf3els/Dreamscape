@@ -2,10 +2,8 @@
 using Dreamscape.Application.Repositories;
 using Dreamscape.Domain.Common;
 using Dreamscape.Persistance.Context;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Dreamscape.Persistance.Repositories
 {
@@ -50,7 +48,7 @@ namespace Dreamscape.Persistance.Repositories
                 query = predicate.Aggregate(query, (current, filter) => current.Where(filter));
             }
 
-            return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+            return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<PagedList<T>> GetPagedAsync(

@@ -3,9 +3,8 @@ using Dreamscape.Application.Collections.Commands.AutoAppendFileToCollection;
 using Dreamscape.Application.Collections.Commands.CreateCollection;
 using Dreamscape.Application.Collections.Commands.DeleteCollection;
 using Dreamscape.Application.Collections.Commands.RemoveFileFromCollection;
+using Dreamscape.Application.Collections.Commands.UpdateCollection;
 using Dreamscape.Application.Collections.Queries.GetPagedCollections;
-using Dreamscape.Application.Users.Queries.GetUser;
-using Dreamscape.UI.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -81,6 +80,20 @@ namespace Dreamscape.UI.Controllers
         {
             await _mediator.Send(new AutoAppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, fileId));
             return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("Update")]
+        public async Task<IActionResult> Update(string collectionId, string name, string description, bool isPrivate)
+        {
+            var result = await _mediator.Send(new UpdateCollectionCommand(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                collectionId,
+                name,
+                description,
+                isPrivate));
+
+            return Ok(result);
         }
 
         [Authorize]
