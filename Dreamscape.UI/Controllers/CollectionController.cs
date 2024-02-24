@@ -22,15 +22,6 @@ namespace Dreamscape.UI.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
-        [HttpGet("Collections")]
-        public async Task<IActionResult> Collections(GetPagedCollectionsQuery request)
-        {
-            var collections = await _mediator.Send(request);
-
-            return View(collections);
-        }
-
         [Authorize]
         [HttpGet("User")]
         public async Task<IActionResult> GetUserCollections()
@@ -38,7 +29,7 @@ namespace Dreamscape.UI.Controllers
             var collections = await _mediator.Send(new GetPagedCollectionsQuery()
             {
                 OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                SortOrder = 2,
+                Private = true
             });
 
             return Ok(collections);
@@ -46,14 +37,15 @@ namespace Dreamscape.UI.Controllers
 
         [Authorize]
         [HttpGet("Manage")]
-        public async Task<IActionResult> Manage(GetPagedCollectionsQuery request)
+        public async Task<IActionResult> Manage(int page = 1, int pageSize = 16)
         {
             var collections = await _mediator.Send(new GetPagedCollectionsQuery()
             {
                 OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                Page = request.Page,
-                PageSize = request.PageSize
-            });
+                Page = page,
+                PageSize = pageSize,
+                Private = true
+            }); 
 
             return View(collections);
         }

@@ -28,6 +28,11 @@ namespace Dreamscape.Application.Collections.Queries.GetPagedCollections
             {
                 filterExpressions = filterExpressions.Append(c => c.Name == request.Search).ToArray();
             }
+            
+            if (!request.Private)
+            {
+                filterExpressions = filterExpressions.Append(c => !c.IsPrivate).ToArray();
+            }
 
             var result = await _collectionRepository.GetPagedAsync(
               request.Page,

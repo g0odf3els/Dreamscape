@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace Dreamscape.Controllers
 {
-    [Route("File")]
+    [Route("Files")]
     public class FileController : Controller
     {
         private readonly IMediator _mediator;
@@ -23,14 +23,14 @@ namespace Dreamscape.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("Files")]
+        [HttpGet]
         public async Task<IActionResult> Files(GetPagedFilesQuery query)
         {
             var result = await _mediator.Send(query);
             return View(result);
         }
 
-        [HttpGet("File/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> File(GetFileQuery query)
         {
             var image = await _mediator.Send(query);
@@ -67,7 +67,7 @@ namespace Dreamscape.Controllers
         }
 
         [Authorize]
-        [HttpPost("Delete/{id}")]
+        [HttpPost("{id}/Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
@@ -76,7 +76,7 @@ namespace Dreamscape.Controllers
             return RedirectToAction("Files", "File");
         }
 
-        [HttpPost("Download/{id}")]
+        [HttpPost("{id}/Download")]
         public async Task<IActionResult> Download(GetFileQuery request)
         {
             var file = await _mediator.Send(request);
@@ -84,7 +84,7 @@ namespace Dreamscape.Controllers
             return file == null ? NotFound() : File(file.FullSizePath, "text/plain", file.Name);
         }
 
-        [HttpGet("Resize/{id}")]
+        [HttpGet("{id}Resize")]
         public async Task<IActionResult> Resize(string id)
         {
             var file = await _mediator.Send(new GetFileQuery(id));
@@ -93,7 +93,7 @@ namespace Dreamscape.Controllers
         }
 
         [Authorize]
-        [HttpPost("AddTag")]
+        [HttpPost("{fileId}/AddTag/{tagName}")]
         public async Task<IActionResult> AddTag(string fileId, string tagName)
         {
             await _mediator.Send(new AddTagToFileCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), fileId, tagName));
@@ -102,7 +102,7 @@ namespace Dreamscape.Controllers
         }
 
         [Authorize]
-        [HttpPost("RemoveTag")]
+        [HttpPost("{fileId}/RemoveTag/{tagName}")]
         public async Task<IActionResult> RemoveTag(string fileId, string tagName)
         {
             await _mediator.Send(new RemoveTagFromFileCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), fileId, tagName));
