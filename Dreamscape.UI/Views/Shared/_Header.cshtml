@@ -119,60 +119,47 @@
     <script>
         $(function () {
 
-            var urlParams = new URLSearchParams(window.location.search);
-            var resolutionsParam = urlParams.get('resolutions');
-            var aspectParam = urlParams.get('aspectRatios');
-            var orderParam = urlParams.get('order');
-
-            var search = urlParams.get('search');
-
-            if (resolutionsParam) {
-                var selectedResolutions = resolutionsParam.split(',');
-
-                selectedResolutions.forEach(function (resolution) {
-                    $('.resolution-option[data-value="' + resolution + '"]').addClass('selected');
-                });
+            function getURLParams() {
+                var urlParams = new URLSearchParams(window.location.search);
+                return {
+                    resolutions: urlParams.get('resolutions'),
+                    aspectRatios: urlParams.get('aspectRatios'),
+                    order: urlParams.get('order'),
+                    search: urlParams.get('search')
+                };
             }
 
-            if (aspectParam) {
-                var selectedAspectRatios = aspectParam.split(',');
+            function handleParams() {
+                var params = getURLParams();
 
-                selectedAspectRatios.forEach(function (aspectRatio) {
-                    $('.aspect-ratio-option[data-value="' + aspectRatio + '"]').addClass('selected');
-                });
+                if (params.resolutions) {
+                    var selectedResolutions = params.resolutions.split(',');
+                    selectedResolutions.forEach(function (resolution) {
+                        $('.resolution-option[data-value="' + resolution + '"]').addClass('selected');
+                    });
+                }
+
+                if (params.aspectRatios) {
+                    var selectedAspectRatios = params.aspectRatios.split(',');
+                    selectedAspectRatios.forEach(function (aspectRatio) {
+                        $('.aspect-ratio-option[data-value="' + aspectRatio + '"]').addClass('selected');
+                    });
+                }
+
+                if (params.order != null) {
+                    $('.order-option[data-value="' + params.order + '"]').addClass('selected');
+                }
+
+                if (params.search) {
+                    $('#search').val(params.search);
+                }
             }
 
-            if (orderParam) {
-                $('.order-option[data-value="' + orderParam + '"]').addClass('selected');
-            }
-
-            if (search) {
-                $('#search').val(search);
-            }
-
-            var dropbtns = document.querySelectorAll('.dropbtn');
-            var dropdownContents = document.querySelectorAll('.dropdown-content');
-
-            dropbtns.forEach(function (dropbtn, index) {
-                dropbtn.addEventListener('click', function () {
-                    var dropdownContent = dropdownContents[index];
-
-                    dropdownContent.style.display = (dropdownContent.style.display === 'block') ? 'none' : 'block';
-                    dropbtn.style.color = (dropbtn.style.color === 'black') ? 'white' : 'black';
-                    dropbtn.style.backgroundColor = (dropbtn.style.backgroundColor === 'white') ? 'black' : 'white';
-                });
-            });
+            handleParams();
 
             $('.order-option').click(function () {
                 $('.order-option').removeClass('selected');
                 $(this).addClass('selected');
-
-                var orderValue = $(this).data('value');
-                $('input[name="order"]').remove(); 
-                $('<input />').attr('type', 'hidden')
-                    .attr('name', 'order')
-                    .attr('value', orderValue)
-                    .appendTo('form.searchbar-form');
             });
 
             $('.params-table_option').click(function () {
@@ -190,7 +177,6 @@
                             var availableTags = data.map(function (tag) {
                                 return tag.name;
                             });
-
                             $("#search").autocomplete({
                                 source: availableTags
                             });
@@ -221,25 +207,21 @@
                 }
 
                 if (selectedResolutions.length > 0) {
-                    $('<input />').attr('type', 'hidden')
-                        .attr('name', 'resolutions')
-                        .attr('value', selectedResolutions)
-                        .appendTo('form.searchbar-form');
+                    $('<input />').attr({ 'type': 'hidden', 'name': 'resolutions', 'value': selectedResolutions }).appendTo('form.searchbar-form');
                 }
 
                 if (selectedAspectRatios.length > 0) {
-                    $('<input />').attr('type', 'hidden')
-                        .attr('name', 'aspectRatios')
-                        .attr('value', selectedAspectRatios)
-                        .appendTo('form.searchbar-form');
+                    $('<input />').attr({ 'type': 'hidden', 'name': 'aspectRatios', 'value': selectedAspectRatios }).appendTo('form.searchbar-form');
+                }
+
+                var selectedOrder = $('.order-option.selected').data('value');
+                if (selectedOrder != null) {
+                    $('<input />').attr({ 'type': 'hidden', 'name': 'order', 'value': selectedOrder }).appendTo('form.searchbar-form');
                 }
 
                 var searchValue = $('#search').val().trim();
                 if (searchValue !== "") {
-                    $('<input />').attr('type', 'hidden')
-                        .attr('name', 'search')
-                        .attr('value', searchValue)
-                        .appendTo('form.searchbar-form');
+                    $('<input />').attr({ 'type': 'hidden', 'name': 'search', 'value': searchValue }).appendTo('form.searchbar-form');
                 }
 
                 this.submit();

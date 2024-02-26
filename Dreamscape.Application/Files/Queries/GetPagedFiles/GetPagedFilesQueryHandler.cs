@@ -105,12 +105,12 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
 
             switch (request.Order)
             {
-                case (int)FileSortOrderEnum.DateAdded:
-                    orderBy = f => f.DataCreated;
-                    break;
-
                 case (int)FileSortOrderEnum.Random:
                     orderBy = f => Guid.NewGuid();
+                    break;
+
+                default:
+                    orderBy = f => f.DataCreated;
                     break;
             }
 
