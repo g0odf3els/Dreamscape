@@ -19,5 +19,9 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
         public string? CollectionId { get; set; }
 
         public IFormFile File { get; set; }
+
+        public int Order { get; set; } = 0;
+
+        public bool OrderByDescending = true;
     }
 }
