@@ -5,6 +5,7 @@ using Dreamscape.Domain.Entities;
 using MediatR;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Tensorflow.Contexts;
 
 namespace Dreamscape.Application.Files.Queries.GetPagedFiles
 {
@@ -22,7 +23,7 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
         public async Task<PagedList<ImageFileViewModel>> Handle(GetPagedFilesQuery request, CancellationToken cancellationToken)
         {
             Expression<Func<ImageFile, bool>>[] filterExpressions = [];
-           
+
             if (request.CollectionId != null)
             {
                 filterExpressions = filterExpressions.Append(f => f.Collections.Any(c => c.Id.ToString() == request.CollectionId)).ToArray();
@@ -71,7 +72,7 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
                     filterExpressions = filterExpressions.Append(lambda).ToArray();
                 }
             }
-            
+
             if (request.AspectRatios != null)
             {
                 var f = Expression.Parameter(typeof(ImageFile), "f");
@@ -100,11 +101,25 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
                 }
             }
 
-            
+            Expression<Func<ImageFile, object>>? orderBy = null;
+
+            switch (request.Order)
+            {
+                case (int)FileSortOrderEnum.DateAdded:
+                    orderBy = f => f.DataCreated;
+                    break;
+
+                case (int)FileSortOrderEnum.Random:
+                    orderBy = f => Guid.NewGuid();
+                    break;
+            }
+
             var result = await _fileRepository.GetPagedAsync(
                 pageNumber: request.Page,
                 pageSize: request.PageSize,
                 predicate: filterExpressions,
+                orderBy: orderBy,
+                orderByDescending: request.OrderByDescending,
                 include: [
                     f => f.Resolution,
                     f => f.Uploader,

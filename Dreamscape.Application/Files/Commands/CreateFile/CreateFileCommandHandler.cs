@@ -76,6 +76,7 @@ namespace Dreamscape.Application.Files.Commands.CreateFile
                 Uploader = user,
                 UploaderId = request.UserId,
                 Length = file.Length,
+                DataCreated = DateTimeOffset.UtcNow
             };
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))

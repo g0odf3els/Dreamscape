@@ -27,7 +27,6 @@ namespace Dreamscape.Application.Files
 
         public IEnumerable<ColorViewModel>? Colors { get; set; }
 
-        public double Lenght { get; set; }
-
+        public double Length { get; set; }
     }
 }
