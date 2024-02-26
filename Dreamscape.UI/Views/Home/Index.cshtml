@@ -1,8 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Dreamscape.UI.ViewModels.IndexViewModel;
+
+@{
+    ViewData["Title"] = "Dreamscape: Home";
+    Layout = "";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<head>
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<div class="home-page">
+
+    <a class="home-page__logo" asp-controller="File" asp-action="Files">Dreamscape</a>
+
+    <div class="home-page__search">
+
+        <form class="searchbar-form" asp-controller="File" asp-action="Files" method="get" enctype="multipart/form-data">
+            <input id="search" type="text" placeholder="Search..." />
+            <button style="border-color: white" class="animated-btn" type="submit">Search</button>
+        </form>
+
+    </div>
+
+    @await Html.PartialAsync("_FileGallery", Model.RecentUploaded.Items)
+
 </div>
+
+
