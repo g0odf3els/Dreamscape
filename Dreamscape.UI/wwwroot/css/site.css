@@ -1088,3 +1088,27 @@ body {
 .navigation__selected {
     border-bottom: 2px solid black;
 }
+
+.home-page {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+}
+
+.home-page__logo {
+    font-size: 42px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    padding-top: 25px;
+    width: 100%;
+    color: white;
+}
+
+.home-page__search {
+    padding: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}

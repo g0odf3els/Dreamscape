@@ -1,21 +1,28 @@
+using Dreamscape.Application.Files.Queries.GetPagedFiles;
 using Dreamscape.UI.Models;
+using Dreamscape.UI.ViewModels;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Dreamscape.UI.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IMediator _mediator;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IMediator mediator)
         {
             _logger = logger;
+            _mediator = mediator;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return RedirectToAction("", "Files");
+            var result = await _mediator.Send(new GetPagedFilesQuery() { PageSize = 32});
+            return View(new IndexViewModel() { RecentUploaded = result });
         }
 
         public IActionResult Privacy()
