@@ -55,7 +55,6 @@ body {
 }
 
 /*------dropdown------*/
-
 .dropbtn {
     white-space: nowrap;
     padding: 12px 16px;
@@ -111,14 +110,6 @@ body {
 
 /*--------------------*/
 
-.select {
-    white-space: nowrap;
-    padding: 12px 16px;
-    background-color: black;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
 
 /*----animated-btn----*/
 
@@ -193,14 +184,14 @@ body {
     width: 50%;
 }
 
-.searchbar-form input {
-    margin-right: 10px;
-    width: 100%;
-}
+    .searchbar-form input {
+        margin-right: 10px;
+        width: 100%;
+    }
 
-.searchbar-form button {
-    max-width: 100px;
-}
+    .searchbar-form button {
+        max-width: 100px;
+    }
 
 @media (max-width: 1000px) {
     .nav {
@@ -236,10 +227,10 @@ body {
     text-wrap: nowrap;
 }
 
-    .selected {
-        background-color: #ccc;
-        box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
-    }
+.selected {
+    background-color: #ccc;
+    box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+}
 
 .custom-resolution {
     display: flex;
@@ -260,7 +251,6 @@ body {
 /*--------------------*/
 
 /*-------form---------*/
-
 .form {
     padding: 25px;
     max-width: 500px;
@@ -356,6 +346,7 @@ body {
 @media (max-width: 800px) {
     .sidebar {
         width: 100%;
+        flex-basis: unset !important;
         height: fit-content;
         overflow-y: unset;
     }
@@ -506,11 +497,13 @@ body {
     display: flex;
     position: relative;
     box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;
-    height:fit-content;
+    height: fit-content;
 }
+
     .file-gallery__container a {
         width: 100%;
     }
+
 .file-gallery__img {
     object-fit: cover;
 }
@@ -549,33 +542,38 @@ body {
 /*------user-card-----*/
 
 .user-card {
-    height: fit-content;
     padding: 15px;
 }
 
-    .user-card a {
-        height: 100%;
-    }
-
 .user-card__img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    height: 275px;
+    width: 100%;
+    display: flex;
+    position: relative;
     box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;
 }
+
+    .user-card__img img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        display: flex;
+        position: relative;
+    }
 
 .user-card__username {
     font-size: 24px;
 }
 
 @media (max-width: 800px) {
+
     .user-card {
-        height: 80px;
         flex-direction: row;
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 5px;
-        padding-bottom: 5px;
+    }
+
+    .user-card__img {
+        height: 100px;
+        width: 100px;
     }
 
     .user-card__username {
@@ -589,16 +587,16 @@ body {
 
 /*------file-----*/
 
+.file__info-sidebar {
+    flex-basis: 400px;
+}
+
 .file:nth-of-type(1) .tag-list {
     position: absolute;
 }
 
-.file_left-sidebar {
-    flex-basis: 400px;
-}
-
-.file_right-sidebar {
-    flex-basis: 600px;
+.file__similar-files {
+    width: 600px;
 }
 
 .image-box {
@@ -668,9 +666,12 @@ body {
 
 /*------profile-------*/
 
+.profile__info-sidebar
+{
+    flex-basis: 300px;
+}
 .profile {
     min-height: 100%;
-    height: 100%;
     height: fit-content;
 }
 
@@ -679,11 +680,11 @@ body {
         flex-direction: column;
     }
 }
-
+.profile__objects-not-found {
+    padding: 25px;
+}
 /*--------------------*/
-
 /*------resize-------*/
-
 .resize {
     width: 100%;
     height: 100%;
@@ -936,9 +937,9 @@ body {
     height: 500px;
 }
 
-.modal-content label {
-    width: 100%;
-}
+    .modal-content label {
+        width: 100%;
+    }
 
 @media (max-width: 800px) {
     .modal-content {
@@ -973,9 +974,9 @@ body {
     width: 100%;
 }
 
-.add-to-collection-form h2{
-    font-size: 28px;
-}
+    .add-to-collection-form h2 {
+        font-size: 28px;
+    }
 
     .add-to-collection-form button {
         margin-top: 10px;
@@ -1042,12 +1043,12 @@ body {
         padding-bottom: 2px;
     }
 
-    .collection-settings__button {
-        background-color: transparent;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-    }
+.collection-settings__button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
 
 .collection-settings__icon {
     width: 20px;
@@ -1076,10 +1077,22 @@ body {
     border-bottom: 1px solid #ccc;
 }
 
-.navigation a {
-    color: black;
-    text-decoration: none;
+.navigation-horizontal {
+    flex-direction: column;
+    width:fit-content;
 }
+
+
+@media (max-width: 1000px) {
+    .navigation {
+        justify-content: center;
+    }
+}
+
+    .navigation a {
+        color: black;
+        text-decoration: none;
+    }
 
 .navigation__element {
     padding: 15px 25px;
@@ -1111,4 +1124,42 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
+}
+
+/*-------settings---------*/
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.settings h2 {
+    padding-bottom: 15px;
+    font-size: 24px;
+    text-align:left;
+}
+
+.settings__user-forms {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.user-form__fild {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+}
+
+    .user-form__fild input {
+        margin-top: 5px;
+    }
+
+.settings__profile-image {
+    margin-bottom: 25px;
+    width: 100%;
 }

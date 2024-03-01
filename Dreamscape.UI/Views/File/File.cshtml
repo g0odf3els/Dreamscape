@@ -9,7 +9,7 @@
 
 <div class="file container flex-row">
 
-    <div class="sidebar file_left-sidebar">
+    <div class="sidebar file__info-sidebar">
 
         @await Html.PartialAsync("_UserCard", Model.Image.Uploader)
 
@@ -135,7 +135,7 @@
         <img src="@Model.Image.FullSizePath" />
     </div>
 
-    <div class="sidebar file_right-sidebar">
+    <div class="sidebar file__similar-files">
         @if (Model.SimilarImages != null)
         {
             <div class="similar-files">
