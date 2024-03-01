@@ -9,21 +9,9 @@
 
 <div class="profile container flex-row">
 
-    <div class="sidebar flex-column">
+    <div class="sidebar profile__info-sidebar">
 
         @await Html.PartialAsync("_UserCard", Model.User)
-
-        @if (@Model.User.Id.ToString() == @User.FindFirstValue(ClaimTypes.NameIdentifier) || @User.IsInRole("Admin"))
-        {
-            <form method="get" class="px-10 pb-5" asp-action="ChangeProfileImage" asp-controller="Users" enctype="multipart/form-data">
-                <button class="animated-btn" type="submit">
-                    <div class="flex-row justify-content-space-between align-items-center">
-                        <span>Edit</span>
-                        <span class="material-symbols-outlined">settings</span>
-                    </div>
-                </button>
-            </form>
-        }
 
     </div>
 
@@ -32,7 +20,7 @@
         <div class="navigation">
 
             <div class="navigation__element">
-                <a asp-controller="User" asp-action="Uploads" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                <a asp-controller="User" asp-action="Uploads" asp-route-userId="@Model.User.Id">
                     Uploads
                 </a>
             </div>
@@ -41,13 +29,23 @@
                 Collections
             </div>
 
+            @if (@Model.User.Id.ToString() == @User.FindFirstValue(ClaimTypes.NameIdentifier) || @User.IsInRole("Admin"))
+            {
+                <div class="navigation__element">
+                    <a asp-controller="User" asp-action="SettingsProfile">
+                        Settings
+                    </a>
+                </div>
+            }
+
+
         </div>
 
         @if (Model.Items.TotalCount == 0)
         {
-            <p>
+            <div class="profile__objects-not-found">
                 User has not any collections yet
-            </p>
+            </div>
         }
         else
         {

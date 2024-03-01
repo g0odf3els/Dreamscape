@@ -4,9 +4,11 @@
 
 <div class="user-card flex-column align-items-center">
 
-    <a asp-controller="User" asp-action="Uploads" asp-route-userId="@Model.Id">
-        <img class="user-card__img" src=@(Model.UserImagePath ?? "/Assets/Images/default-user-image.png") />
-    </a>
+    <div class="user-card__img">
+        <a asp-controller="User" asp-action="Uploads" asp-route-userId="@Model.Id">
+            <img src=@(Model.UserProfileImagePath ?? "/Assets/Images/default-user-image.png") />
+        </a>
+    </div>
 
     <div class="user-card__username pt-5">
         @Model.Username

@@ -15,6 +15,8 @@ namespace Dreamscape.Domain.Entities
         public DateTimeOffset DataUpdated { get; set; }
         public DateTimeOffset DataDeleted { get; set; }
 
+        public string? UserProfileImagePath { get; set; }
+
         public List<ImageFile> UploadedFiles { get; set; }
 
         public List<Collection> Collections { get; set; }
@@ -22,5 +24,7 @@ namespace Dreamscape.Domain.Entities
         public string? RefreshToken { get; set; }
 
         public DateTime? RefreshTokenExpiryTime { get; set; }
+
+
     }
 }

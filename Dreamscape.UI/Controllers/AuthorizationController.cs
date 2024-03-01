@@ -1,5 +1,6 @@
 ﻿using Dreamscape.Domain.Entities;
 using Dreamscape.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -95,6 +96,30 @@ namespace Dreamscape.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Files", "File");
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> UpdatePassword(string currentPassword, string newPassword)
+        {
+            if (string.IsNullOrEmpty(currentPassword) || string.IsNullOrEmpty(newPassword))
+            {
+                return BadRequest("Current password and new password are required.");
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                return BadRequest("Failed to change password.");
+            }
+
+            return Ok("Password changed successfully.");
         }
     }
 }

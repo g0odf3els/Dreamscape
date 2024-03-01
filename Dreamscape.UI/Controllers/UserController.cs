@@ -2,10 +2,13 @@
 using Dreamscape.Application.Collections.Queries.GetPagedCollections;
 using Dreamscape.Application.Files;
 using Dreamscape.Application.Files.Queries.GetPagedFiles;
+using Dreamscape.Application.Users.Commands.UpdateUserProfileImage;
 using Dreamscape.Application.Users.Queries.GetUser;
 using Dreamscape.UI.ViewModels;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Dreamscape.UI.Controllers
 {
@@ -52,5 +55,31 @@ namespace Dreamscape.UI.Controllers
                 })
             });
         }
+
+        [Authorize]
+        [HttpGet("Settings/Profile")]
+        public async Task<IActionResult> SettingsProfile()
+        {
+            var user = await _mediator.Send(new GetUserQuery(@User.FindFirstValue(ClaimTypes.NameIdentifier)!));
+            return View(user);
+        }
+
+        [Authorize]
+        [HttpGet("Settings/Password")]
+        public async Task<IActionResult> SettingsPassword()
+        {
+            var user = await _mediator.Send(new GetUserQuery(@User.FindFirstValue(ClaimTypes.NameIdentifier)!));
+            return View(user);
+
+        }
+
+        [Authorize]
+        [HttpPost("Settings/ProfileImage")]
+        public async Task<IActionResult> ProfileImage(IFormFile image)
+        {
+            var result = await _mediator.Send(new UpdateUserProfileImageCommand(image, @User.FindFirstValue(ClaimTypes.NameIdentifier)!));
+            return Ok(result);
+        }
+
     }
 }
