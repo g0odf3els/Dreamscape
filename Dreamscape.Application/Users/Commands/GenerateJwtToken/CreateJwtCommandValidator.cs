@@ -6,7 +6,7 @@ namespace Dreamscape.Application.Users.Commands.GenerateJwtToken
     {
         public CreateJwtCommandValidator()
         {
-            RuleFor(x => x.Username).NotEmpty().MinimumLength(8).MaximumLength(50);
+            RuleFor(x => x.Username).NotEmpty().MinimumLength(4).MaximumLength(50);
             RuleFor(x => x.Password).NotEmpty().MinimumLength(8).MaximumLength(50);
         }
     }

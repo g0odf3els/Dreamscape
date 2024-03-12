@@ -23,9 +23,9 @@ namespace Dreamscape.Application.Files
 
         public required ResolutionViewModel Resolution { get; set; }
 
-        public IEnumerable<TagViewModel>? Tags { get; set; }
+        public IEnumerable<TagViewModel> Tags { get; set; } = [];
 
-        public IEnumerable<ColorViewModel>? Colors { get; set; }
+        public IEnumerable<ColorViewModel> Colors { get; set; } = [];
 
         public double Length { get; set; }
     }

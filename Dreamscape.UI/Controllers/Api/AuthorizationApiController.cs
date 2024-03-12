@@ -18,14 +18,6 @@ namespace Dreamscape.API.Controllers
             _mediator = mediator;
         }
 
-        [Route("User")]
-        [HttpGet]
-        public async Task<ActionResult<UserViewModel>> User(GetUserQuery request, CancellationToken cancellationToken)
-        {
-            var response = await _mediator.Send(request, cancellationToken);
-            return Ok(response);
-        }
-
         [HttpPost]
         [Route("Register")]
         public async Task<ActionResult<UserViewModel>> Register(CreateUserCommand request,

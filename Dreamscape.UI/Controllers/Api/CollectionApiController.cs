@@ -1,15 +1,20 @@
-﻿using Dreamscape.Application.Collections.Commands.AppendFileToCollection;
+﻿using Dreamscape.Application.Collections;
+using Dreamscape.Application.Collections.Commands.AppendFileToCollection;
 using Dreamscape.Application.Collections.Commands.CreateCollection;
+using Dreamscape.Application.Collections.Commands.DeleteCollection;
+using Dreamscape.Application.Collections.Commands.RemoveFileFromCollection;
 using Dreamscape.Application.Collections.Queries.GetCollection;
 using Dreamscape.Application.Collections.Queries.GetPagedCollections;
+using Dreamscape.Application.Files.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace Dreamscape.UI.Controllers.Api
 {
-    [Route("api/Collection")]
+    [Route("api/Collections")]
     public class CollectionApiController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,14 +24,32 @@ namespace Dreamscape.UI.Controllers.Api
             _mediator = mediator;
         }
 
-        [HttpGet("Collections")]
-        public async Task<IActionResult> Collection(GetPagedCollectionsQuery query)
+        [HttpGet]
+        public async Task<IActionResult> Collection(int page = 1, int pageSize = 16, String? ownerId = null)
         {
-            var result = await _mediator.Send(query);
+            var result = await _mediator.Send(new GetPagedCollectionsQuery() {
+                Page = page,
+                PageSize = pageSize,
+                OwnerId = ownerId,
+                Private = false,
+            });
             return Ok(result);
         }
 
-        [HttpGet("Collection/{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("My")]
+        public async Task<IActionResult> MyCollections(int page = 1, int pageSize = 16)
+        {
+            var result = await _mediator.Send(new GetPagedCollectionsQuery()
+            {
+                Page = page,
+                PageSize = pageSize,
+                OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                Private = true,
+            }); return Ok(result);
+        }
+
+        [HttpGet("{id}")]
         public async Task<IActionResult> Collection(string id)
         {
             var result = await _mediator.Send(new GetCollectionQuery(id));
@@ -42,10 +65,26 @@ namespace Dreamscape.UI.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [HttpPost("Append")]
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var result = await _mediator.Send(new DeleteCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, id));
+            return Ok(result);
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpPost("{collectionId}/append/{fileId}")]
         public async Task<IActionResult> Append(string collectionId, string fileId)
         {
             await _mediator.Send(new AppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
+            return Ok();
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpPost("{collectionId}/remove/{fileId}")]
+        public async Task<IActionResult> Remove(string collectionId, string fileId)
+        {
+            await _mediator.Send(new RemoveFileFromCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
             return Ok();
         }
     }

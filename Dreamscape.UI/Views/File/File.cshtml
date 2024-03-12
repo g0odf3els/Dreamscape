@@ -3,8 +3,14 @@
 @using System.Security.Claims;
 @using Dreamscape.Domain.Entities
 
-@section metatags {
+@{
+    ViewData["Title"] = $"Download {string.Join(", ", Model.Image.Tags.Select(t => t.Name))} image free";
+}
 
+@section metatags {
+    <meta name="content" content="Download @string.Join(", ", @Model.Image.Tags.Select(t => t.Name)) @Model.Image.Resolution.Width x @Model.Image.Resolution.Height image for free" />
+    <meta name="description" content="Download high-quality images for free with tags: @string.Join(", ", @Model.Image.Tags.Select(t => t.Name))" />
+    <meta name="keywords" content="@string.Join(", ", @Model.Image.Tags.Select(t => t.Name)), download, free, @Model.Image.Resolution.Width x @Model.Image.Resolution.Height" />
 }
 
 <div class="file container flex-row">

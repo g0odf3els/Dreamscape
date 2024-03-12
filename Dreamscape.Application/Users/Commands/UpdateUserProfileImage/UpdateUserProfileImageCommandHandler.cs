@@ -4,6 +4,7 @@ using Dreamscape.Application.Common.Exceptions;
 using Dreamscape.Domain.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
+using ImageMagick;
 
 namespace Dreamscape.Application.Users.Commands.UpdateUserProfileImage
 {
@@ -36,9 +37,18 @@ namespace Dreamscape.Application.Users.Commands.UpdateUserProfileImage
             var uniqueFileName = $"{user.Id}{Path.GetExtension(request.File.FileName)}";
             var filePath = Path.Combine(uploadPath, uniqueFileName);
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            using (MagickImage image = new MagickImage(request.File.OpenReadStream()))
             {
-                await request.File.CopyToAsync(fileStream, cancellationToken);
+                int _previewWidth = 450;
+                int _previewHeight = 450;
+
+                image.Resize(new MagickGeometry(_previewWidth, _previewHeight)
+                {
+                    FillArea = true
+                });
+
+                image.Extent(_previewWidth, _previewHeight, Gravity.Center);
+                image.Write(filePath);
             }
 
             user.UserProfileImagePath = "/userProfileImages/" + uniqueFileName;

@@ -24,10 +24,12 @@ namespace Dreamscape.UI.Controllers
 
         [Authorize]
         [HttpGet("User")]
-        public async Task<IActionResult> GetUserCollections()
+        public async Task<IActionResult> GetUserCollections(int page = 1, int pageSize = 16)
         {
             var collections = await _mediator.Send(new GetPagedCollectionsQuery()
             {
+                Page = page,
+                PageSize = pageSize,
                 OwnerId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 Private = true
             });

@@ -47,7 +47,7 @@ namespace Dreamscape.Application.Users.Commands.GenerateJwtToken
             var refreshToken = JwtTokenHelper.GenerateRefreshToken(claims, _config);
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            user.RefreshTokenExpiryTime = DateTimeOffset.UtcNow.Add(TimeSpan.FromDays(7));
 
             _userRepository.Update(user);
             await _unitOfWork.Save(cancellationToken);

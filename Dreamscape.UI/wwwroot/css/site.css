@@ -550,15 +550,16 @@ body {
     width: 100%;
     display: flex;
     position: relative;
-    box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;
+    justify-content: center;
 }
 
     .user-card__img img {
         height: 100%;
         width: 100%;
         object-fit: cover;
-        display: flex;
+        display: flex;       
         position: relative;
+        box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;
     }
 
 .user-card__username {
@@ -1129,8 +1130,7 @@ body {
 /*-------settings---------*/
 
 .settings {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     padding: 25px;
     width: 100%;
     max-width: 600px;
@@ -1144,7 +1144,6 @@ body {
 
 .settings__user-forms {
     width: 100%;
-    display: flex;
     flex-direction: column;
 
 }
@@ -1160,6 +1159,8 @@ body {
     }
 
 .settings__profile-image {
-    margin-bottom: 25px;
+    justify-self: center;
+    margin: 20px 0;
     width: 100%;
+    max-width: 300px;
 }

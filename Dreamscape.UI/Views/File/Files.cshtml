@@ -4,7 +4,7 @@
 
 @model PagedList<ImageFileViewModel>
 @{
-    ViewData["Title"] = $"Images";
+    ViewData["Title"] = $"Images, page: {Model.PageNumber}";
 }
 
 <div class="container flex-column">

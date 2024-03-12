@@ -23,7 +23,7 @@ namespace Dreamscape.Domain.Entities
 
         public string? RefreshToken { get; set; }
 
-        public DateTime? RefreshTokenExpiryTime { get; set; }
+        public DateTimeOffset? RefreshTokenExpiryTime { get; set; }
 
 
     }

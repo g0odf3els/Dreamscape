@@ -38,6 +38,8 @@ namespace Dreamscape.UI.Extensions
                 {
                     return apiDesc.RelativePath.StartsWith("api/");
                 });
+                c.EnableAnnotations();
+
             });
         }
     }
