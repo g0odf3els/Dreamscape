@@ -2,8 +2,6 @@ using Dreamscape.Application.Common;
 using Dreamscape.Persistance;
 using Dreamscape.Persistance.Context;
 using Dreamscape.UI.Extensions;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigurePersistence(builder.Configuration);
@@ -15,7 +13,6 @@ builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
