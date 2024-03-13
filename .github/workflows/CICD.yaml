@@ -52,7 +52,7 @@ jobs:
                        -e MlModel__Path="${{secrets.MLMODEL_PATH}}" \
                        -e MlModel__LabelsPath="${{secrets.MLMODEL_LABELPATH}}" \
                        -v dreamscape:/app/wwwroot/ \
-                       -v /MIModels:/MIModels \
+                       -v /dreamscape:/MIModels \
                        -p 8000:8080/tcp \
                        --name dreamscape \
                        --restart always \
