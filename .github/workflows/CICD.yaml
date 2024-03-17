@@ -51,8 +51,9 @@ jobs:
                        -e AuthOptions__Key="${{secrets.AUTH_KEY}}" \
                        -e MlModel__Path="${{secrets.MLMODEL_PATH}}" \
                        -e MlModel__LabelsPath="${{secrets.MLMODEL_LABELPATH}}" \
-                       -v dreamscape:/app/wwwroot/ \
-                       -p 8000:80/tcp \
+                       -v /root/wwwroot:/app/wwwroot \
+                       -v /root/MIModels:/app/MIModels \
+                       -p 8000:8080/tcp \
                        --name dreamscape \
                        --restart always \
                        g0odf3els/dreamscape
