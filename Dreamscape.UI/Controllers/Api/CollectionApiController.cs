@@ -1,15 +1,12 @@
-﻿using Dreamscape.Application.Collections;
-using Dreamscape.Application.Collections.Commands.AppendFileToCollection;
+﻿using Dreamscape.Application.Collections.Commands.AppendFileToCollection;
 using Dreamscape.Application.Collections.Commands.CreateCollection;
 using Dreamscape.Application.Collections.Commands.DeleteCollection;
 using Dreamscape.Application.Collections.Commands.RemoveFileFromCollection;
 using Dreamscape.Application.Collections.Queries.GetCollection;
 using Dreamscape.Application.Collections.Queries.GetPagedCollections;
-using Dreamscape.Application.Files.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace Dreamscape.UI.Controllers.Api

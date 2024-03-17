@@ -15,11 +15,11 @@ namespace Dreamscape.API.Controllers
 {
     [Route("api/Files")]
     [ApiController]
-    public class FilesApiController : ControllerBase
+    public class FileApiController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public FilesApiController(IMediator mediator)
+        public FileApiController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -31,10 +31,10 @@ namespace Dreamscape.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("Similar")]
-        public async Task<ActionResult<PagedList<FileViewModel>>> SimilarFiles([FromQuery] GetSimilarPagedFilesQuery request, CancellationToken cancellationToken)
+        [HttpGet("{id}/similar/")]
+        public async Task<ActionResult<PagedList<FileViewModel>>> SimilarFiles([FromRoute]string id, CancellationToken cancellationToken)
         {
-            var response = await _mediator.Send(request, cancellationToken);
+            var response = await _mediator.Send(new GetSimilarPagedFilesQuery() { FileId = id}, cancellationToken);
             return Ok(response);
         }
 
