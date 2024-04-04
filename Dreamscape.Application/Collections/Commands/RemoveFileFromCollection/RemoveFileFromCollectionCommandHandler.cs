@@ -16,7 +16,7 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IModelPredictionService modelPredictionService)
-        : IRequestHandler<RemoveFileFromCollectionCommand, Unit>
+        : IRequestHandler<RemoveFileFromCollectionCommand, CollectionViewModel>
     {
         readonly IUserRepository _userRepository = userRepository;
         readonly IFileRepository _fileRepository = fileRepository;
@@ -26,7 +26,7 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
         readonly IMapper _mapper = mapper;
         readonly IModelPredictionService _modelPredictionService = modelPredictionService;
 
-        public async Task<Unit> Handle(RemoveFileFromCollectionCommand request, CancellationToken cancellationToken)
+        public async Task<CollectionViewModel> Handle(RemoveFileFromCollectionCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetAsync(
              [u => u.Id == request.UserId],
@@ -75,7 +75,8 @@ namespace Dreamscape.Application.Collections.Commands.RemoveFileFromCollection
             }
 
             await _unitOfWork.Save(cancellationToken);
-            return new Unit();
+
+            return _mapper.Map<CollectionViewModel>(collection);
         }
     }
 }

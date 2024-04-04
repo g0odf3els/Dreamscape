@@ -2,6 +2,7 @@ using Dreamscape.Application.Common;
 using Dreamscape.Persistance;
 using Dreamscape.Persistance.Context;
 using Dreamscape.UI.Extensions;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigurePersistence(builder.Configuration);
@@ -16,6 +17,15 @@ builder.Services.AddControllersWithViews()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
+
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = null;
+});
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = null;
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
