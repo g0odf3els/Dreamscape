@@ -3,7 +3,9 @@ using Dreamscape.Application.Services;
 using Dreamscape.Domain.Entities;
 using Dreamscape.Persistance.Context;
 using Dreamscape.Persistance.Repositories;
+using Dreamscape.Persistance.Services.EmailService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +33,12 @@ namespace Dreamscape.Persistance
 
             services.AddScoped<IModelPredictionService, ModelPredictionService>();
 
+            var emailConfig = configuration.GetSection("EmailConfiguration")
+              .Get<EmailConfiguration>();
+
+            services.AddSingleton(emailConfig);
+            services.AddScoped<IEmailService, EmailService>();
+
             services.AddIdentity<User, IdentityRole>(
                 options =>
                 {
@@ -43,6 +51,10 @@ namespace Dreamscape.Persistance
                 })
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
+
+            services.Configure<DataProtectionTokenProviderOptions>(opt =>
+                opt.TokenLifespan = TimeSpan.FromHours(2));
         }
     }
 }
+

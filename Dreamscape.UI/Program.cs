@@ -36,7 +36,7 @@ builder.Services.Configure<RouteOptions>(options =>
 {
     options.AppendTrailingSlash = true;
     options.LowercaseUrls = true;
-    options.LowercaseQueryStrings = true;
+    options.LowercaseQueryStrings = false;
 });
 
 var app = builder.Build();

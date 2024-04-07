@@ -4,9 +4,11 @@ using Dreamscape.Application.Files;
 using Dreamscape.Application.Files.Queries.GetPagedFiles;
 using Dreamscape.Application.Users.Commands.UpdateUserProfileImage;
 using Dreamscape.Application.Users.Queries.GetUser;
+using Dreamscape.Domain.Entities;
 using Dreamscape.UI.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -16,10 +18,12 @@ namespace Dreamscape.UI.Controllers
     public class UserController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly UserManager<User> _userManager;
 
-        public UserController(IMediator mediator)
+        public UserController(IMediator mediator, UserManager<User>  userManager)
         {
             _mediator = mediator;
+            _userManager = userManager;
         }
 
         [HttpGet("{userId}/Uploads")]
@@ -69,8 +73,32 @@ namespace Dreamscape.UI.Controllers
         public async Task<IActionResult> SettingsPassword()
         {
             var user = await _mediator.Send(new GetUserQuery(@User.FindFirstValue(ClaimTypes.NameIdentifier)!));
-            return View(user);
+            return View(new UpdatePasswordViewModel() { User = user });
+        }
 
+        [Authorize]
+        [HttpPost("Settings/Password")]
+        public async Task<IActionResult> SettingsPassword(UpdatePasswordViewModel updatePasswordViewModel)
+        {
+            var userViewModel = await _mediator.Send(new GetUserQuery(@User.FindFirstValue(ClaimTypes.NameIdentifier)!));
+            updatePasswordViewModel.User = userViewModel;
+
+            if (!ModelState.IsValid)
+                return View(updatePasswordViewModel);
+
+            var user = await _userManager.GetUserAsync(User);
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, updatePasswordViewModel.Password, updatePasswordViewModel.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.TryAddModelError(error.Code, error.Description);
+                }
+                return View();
+            }
+
+           return RedirectToAction("Index", "Home");
         }
 
         [Authorize]
