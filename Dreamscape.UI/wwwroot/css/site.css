@@ -1164,3 +1164,20 @@ body {
     width: 100%;
     max-width: 300px;
 }
+
+.message-page {
+    margin: 50px 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.message-page h1 {
+    margin: 15px 0;
+    font-size: 25px;
+}
+
+    .message-page p {
+        text-align: center;
+    }
