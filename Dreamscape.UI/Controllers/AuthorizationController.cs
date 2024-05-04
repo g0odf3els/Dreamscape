@@ -1,7 +1,11 @@
-﻿using Dreamscape.Domain.Entities;
+﻿using Dreamscape.Application.Services;
+using Dreamscape.Domain.Entities;
+using Dreamscape.UI.ViewModels;
 using Dreamscape.ViewModels;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dreamscape.Controllers
@@ -10,11 +14,12 @@ namespace Dreamscape.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-
-        public AuthorizationController(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly IEmailService _emailService;
+        public AuthorizationController(UserManager<User> userManager, SignInManager<User> signInManager, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -98,28 +103,87 @@ namespace Dreamscape.Controllers
             return RedirectToAction("Files", "File");
         }
 
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> UpdatePassword(string currentPassword, string newPassword)
+        [HttpGet]
+        public IActionResult ForgotPassword()
         {
-            if (string.IsNullOrEmpty(currentPassword) || string.IsNullOrEmpty(newPassword))
-            {
-                return BadRequest("Current password and new password are required.");
-            }
+            return View();
+        }
 
-            var user = await _userManager.GetUserAsync(User);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordModel)
+        {
+            if (!ModelState.IsValid)
+                return View(forgotPasswordModel);
+
+            var user = await _userManager.FindByEmailAsync(forgotPasswordModel.Email);
             if (user == null)
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callback = Url.Action(nameof(ResetPassword), "Authorization", new { token, email = user.Email }, Request.Scheme);
+            if (callback != null)
             {
-                return NotFound("User not found.");
+                var emailBody = $@"
+                <h2>Reset Password</h2>
+                <p>Hello,</p>
+                <p>We have received a request to reset your password. Please click the link below to reset your password:</p>
+                <p><a href='{callback}'>Reset Password</a></p>
+                <p>If you did not request a password reset, you can safely ignore this email.</p>
+                <p>Regards,<br>Dreamscape</p>";
+
+                var message = new Message(
+                    new[] { new EmailAddress() { Address = forgotPasswordModel.Email } },
+                    "Reset Password",
+                    emailBody);
+
+                _emailService.SendEmail(message);
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
-            if (!changePasswordResult.Succeeded)
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            var model = new ResetPasswordModel { Token = token, Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordModel)
+        {
+            if (!ModelState.IsValid)
+                return View(resetPasswordModel);
+
+            var user = await _userManager.FindByEmailAsync(resetPasswordModel.Email);
+            if (user == null)
+                RedirectToAction(nameof(ResetPasswordConfirmation));
+
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordModel.Token, resetPasswordModel.Password);
+            if (!resetPassResult.Succeeded)
             {
-                return BadRequest("Failed to change password.");
+                foreach (var error in resetPassResult.Errors)
+                {
+                    ModelState.TryAddModelError(error.Code, error.Description);
+                }
+                return View();
             }
 
-            return Ok("Password changed successfully.");
+            return RedirectToAction(nameof(ResetPasswordConfirmation));
+        }
+
+        [HttpGet]
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
         }
     }
 }

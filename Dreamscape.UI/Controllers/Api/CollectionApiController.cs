@@ -24,7 +24,8 @@ namespace Dreamscape.UI.Controllers.Api
         [HttpGet]
         public async Task<IActionResult> Collection(int page = 1, int pageSize = 16, String? ownerId = null)
         {
-            var result = await _mediator.Send(new GetPagedCollectionsQuery() {
+            var result = await _mediator.Send(new GetPagedCollectionsQuery()
+            {
                 Page = page,
                 PageSize = pageSize,
                 OwnerId = ownerId,
@@ -73,16 +74,16 @@ namespace Dreamscape.UI.Controllers.Api
         [HttpPost("{collectionId}/append/{fileId}")]
         public async Task<IActionResult> Append(string collectionId, string fileId)
         {
-            await _mediator.Send(new AppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
-            return Ok();
+            var reslut = await _mediator.Send(new AppendFileToCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
+            return Ok(reslut);
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPost("{collectionId}/remove/{fileId}")]
         public async Task<IActionResult> Remove(string collectionId, string fileId)
         {
-            await _mediator.Send(new RemoveFileFromCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
-            return Ok();
+            var reslut = await _mediator.Send(new RemoveFileFromCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
+            return Ok(reslut);
         }
     }
 }

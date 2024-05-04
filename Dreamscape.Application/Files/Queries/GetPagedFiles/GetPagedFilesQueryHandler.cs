@@ -36,7 +36,7 @@ namespace Dreamscape.Application.Files.Queries.GetPagedFiles
 
             if (request.Search != null && request.Search.Length > 0)
             {
-                filterExpressions = filterExpressions.Append(f => f.Tags.Any(t => t.Name == request.Search.ToLower())).ToArray();
+                filterExpressions = filterExpressions.Append(f => f.Tags.Any(t => request.Search.Contains(t.Name))).ToArray();
             }
 
             if (request.Resolutions != null)
