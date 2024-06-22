@@ -2,10 +2,7 @@
 using Dreamscape.Domain.Entities;
 using Dreamscape.UI.ViewModels;
 using Dreamscape.ViewModels;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dreamscape.Controllers
@@ -14,12 +11,10 @@ namespace Dreamscape.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly IEmailService _emailService;
-        public AuthorizationController(UserManager<User> userManager, SignInManager<User> signInManager, IEmailService emailService)
+        public AuthorizationController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _emailService = emailService;
         }
 
         [HttpGet]
@@ -137,7 +132,6 @@ namespace Dreamscape.Controllers
                     "Reset Password",
                     emailBody);
 
-                _emailService.SendEmail(message);
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 
