@@ -33,12 +33,6 @@ namespace Dreamscape.Persistance
 
             services.AddScoped<IModelPredictionService, ModelPredictionService>();
 
-            var emailConfig = configuration.GetSection("EmailConfiguration")
-              .Get<EmailConfiguration>();
-
-            services.AddSingleton(emailConfig);
-            services.AddScoped<IEmailService, EmailService>();
-
             services.AddIdentity<User, IdentityRole>(
                 options =>
                 {
