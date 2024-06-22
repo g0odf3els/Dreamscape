@@ -93,7 +93,7 @@ namespace Dreamscape.Controllers
         }
 
         [Authorize]
-        [HttpPost("AddTag")]
+        [HttpPost("{fileId}/AddTag/{tagName}")]
         public async Task<IActionResult> AddTag(string fileId, string tagName)
         {
             await _mediator.Send(new AddTagToFileCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), fileId, tagName));
@@ -102,7 +102,7 @@ namespace Dreamscape.Controllers
         }
 
         [Authorize]
-        [HttpPost("RemoveTag")]
+        [HttpPost("{fileId}/RemoveTag/{tagName}")]
         public async Task<IActionResult> RemoveTag(string fileId, string tagName)
         {
             await _mediator.Send(new RemoveTagFromFileCommand(User.FindFirstValue(ClaimTypes.NameIdentifier), fileId, tagName));

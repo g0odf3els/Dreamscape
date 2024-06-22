@@ -95,7 +95,6 @@ namespace Dreamscape.UI.Controllers
         public async Task<IActionResult> Remove(string collectionId, string fileId)
         {
             await _mediator.Send(new RemoveFileFromCollectionCommand(User.FindFirstValue(ClaimTypes.NameIdentifier)!, collectionId, fileId));
-           
             return Ok();
         }
 
